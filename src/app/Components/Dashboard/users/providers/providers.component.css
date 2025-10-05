@@ -1,0 +1,8 @@
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* إخفاء شريط التمرير في Firefox */
+.scrollbar-hide {
+  scrollbar-width: none;
+}

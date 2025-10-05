@@ -1,0 +1,6 @@
+.bgGround {
+  background: linear-gradient(to right, #c35eda, #8b5cf6);
+  background-size: cover;
+  background-position: center;
+  height: 100vh;
+}

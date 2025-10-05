@@ -1,0 +1,36 @@
+/* popup الأساسي */
+.tw-popup {
+  border-radius: 9rem !important; /* rounded-xl */
+  background: #000 !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+  border: 1px solid #e5e7eb !important; /* gray-200 */
+}
+
+/* العنوان */
+.tw-title {
+  font-size: 1.25rem !important; /* text-xl */
+  font-weight: 600 !important;   /* font-semibold */
+  color: #1e3a8a !important;     /* blue-900 */
+  margin-bottom: 0.5rem !important;
+}
+
+/* النص */
+.tw-text {
+  font-size: 1rem !important; /* text-base */
+  color: #374151 !important;  /* gray-700 */
+}
+
+/* زرار الـ confirm */
+.tw-confirm {
+  background-color: #16a34a !important; /* green-600 */
+  color: white !important;
+  border-radius: 0.75rem !important; /* rounded-lg */
+  font-size: 0.95rem !important;
+  font-weight: 500 !important;
+  padding: 0.5rem 1.25rem !important;
+  transition: background-color 0.2s ease-in-out !important;
+}
+
+.tw-confirm:hover {
+  background-color: #15803d !important; /* green-700 */
+}

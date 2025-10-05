@@ -1,0 +1,13 @@
+.active {
+  background-color: #f1f1f1;
+  color: black;
+}
+/* إخفاء شريط التمرير في WebKit (Chrome, Safari) */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* إخفاء شريط التمرير في Firefox */
+.scrollbar-hide {
+  scrollbar-width: none;
+}

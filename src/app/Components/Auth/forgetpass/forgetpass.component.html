@@ -1,0 +1,39 @@
+<div class="min-h-screen flex items-center justify-center ">
+  <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md">
+    <!-- <h2 class="text-3xl font-bold mb-6 text-center text-gray-800">Welcome Back 👋</h2> -->
+    <h2 class="text-3xl font-bold mb-6 text-center text-gray-800">
+      Forgot your password?
+    </h2>
+    <form [formGroup]="loginForm" (ngSubmit)="ForgetPass()" class="">
+
+      <!-- Phone -->
+      <div class="flex flex-col mb-[30px] ">
+        <label class="text-sm font-medium text-gray-700 mb-1">Enter Your Phone</label>
+        <input type="text" formControlName="phone"
+          class="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-indigo-400 focus:outline-none"
+          placeholder="Enter your phone" />
+        <small *ngIf="loginForm.get('phone')?.touched && loginForm.get('phone')?.invalid"
+          class="text-red-500">
+          phone is required
+        </small>
+      </div>
+
+      <!-- <div>
+        <p>
+          <a routerLink="/forgetpass" class="text-indigo-600 hover:underline">Forget password?</a>
+        </p>
+      </div> -->
+
+      <!-- Submit -->
+      <button type="submit" [disabled]="loginForm.invalid"
+        class="w-full cursor-pointer bg-indigo-600 outline-none disabled:cursor-not-allowed disabled:opacity-[0.5] mb-[10px] disabled:hover:bg-indigo-600 text-white py-2 rounded-lg font-semibold hover:bg-indigo-700 transition">
+        Verify
+      </button>
+      <button type="button" routerLink="/login"
+        class="bg-gray-500 w-full cursor-pointer outline-none text-white py-2 rounded-lg hover:bg-gray-600 transition">
+        Cancel
+      </button>
+
+    </form>
+  </div>
+</div>

@@ -1,0 +1,44 @@
+<aside
+  class="bg-gray-900 text-white w-64 h-[calc(100vh-4rem)] fixed top-16 left-0 shadow-lg transition-all duration-300 ease-in-out">
+  <div class="mt-4 flex flex-col space-y-2 h-full px-4">
+
+    <ng-container *ngFor="let item of links">
+
+      <!-- لو مفيش children -->
+      <a *ngIf="!item.children" routerLinkActive="active" [routerLink]="item.url"
+        class="hover:bg-gray-700 px-3 py-2 rounded-lg text-[18px] flex items-center gap-3 transition">
+        <i class="fas {{item.icon}}"></i>
+        {{item.name}}
+      </a>
+
+      <!-- لو فيه children -->
+      <div *ngIf="item.children" class="flex flex-col">
+        <button (click)="toggleDropdown(item.name)"
+          class="flex items-center justify-between hover:bg-gray-700 px-3 py-2 rounded-lg text-[18px] w-full transition">
+          {{ item.name }}
+          <i class="fas" [ngClass]="openDropdown === item.name ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+        </button>
+
+        <div
+          [ngClass]="{'max-h-40 opacity-100': openDropdown === item.name, 'max-h-0 opacity-0': openDropdown !== item.name}"
+          class="flex flex-col overflow-hidden transition-all duration-300 ease-in-out pl-6">
+          <a *ngFor="let child of item.children" routerLinkActive="active" [routerLink]="child.url"
+            class="flex items-center gap-2 px-3 py-2 text-[16px] hover:bg-gray-700 rounded-lg transition">
+            <i class="fas" [ngClass]="child.icon"></i>
+            {{ child.name }}
+          </a>
+        </div>
+      </div>
+
+    </ng-container>
+
+    <!-- Divider -->
+    <hr class="border-gray-700 my-3">
+
+    <!-- Logout -->
+    <a (click)="Logout()"
+      class="hover:bg-red-600 cursor-pointer px-3 py-2 text-[18px] rounded-lg transition flex items-center gap-2">
+      <i class="fas fa-sign-out-alt"></i> Logout
+    </a>
+  </div>
+</aside>

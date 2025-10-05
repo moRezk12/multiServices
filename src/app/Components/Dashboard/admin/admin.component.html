@@ -1,0 +1,140 @@
+<p>admin works!</p>
+<section class="mt-[40px]">
+  <!-- Add Admin Button -->
+  <div class="flex justify-between  items-center ">
+    <div>
+      <select [(ngModel)]="accountType" (change)="getAlladmins(accountType)"
+        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm outline-none rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+
+        <option value="Admin" selected>Admin</option>
+        <option value="manager">Restaurant Manager</option>
+        <option value="staff">Supermarket Manager</option>
+      </select>
+
+    </div>
+    <div class="mb-6 text-right ">
+      <button (click)="openAddModal()" class="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 transition">
+        + Add Admin
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div *ngIf="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+    <div
+      class="bg-white p-8 rounded-2xl shadow-2xl w-[70%] max-h-[90vh] overflow-y-auto scrrolHide mx-auto relative transition-transform duration-300 scale-100">
+
+      <!-- Header -->
+      <div class="flex items-center mb-6" [ngClass]="{ 'justify-between': !show, 'justify-end': show }">
+        <h2 class="text-2xl font-bold text-gray-800" *ngIf="!show">
+          {{ mode ? 'Edit Admin' : 'Add Admin' }}
+        </h2>
+        <div
+          class="bg-red-500 hover:bg-red-600 text-white w-8 h-8 flex items-center justify-center rounded-full shadow-md cursor-pointer transition-all duration-300"
+          (click)="closeModal()">
+          ✕
+        </div>
+      </div>
+
+      <!-- Form -->
+      <form [formGroup]="adminForm" (ngSubmit)="onSubmit()" class="space-y-6">
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Name -->
+          <div>
+            <label class="block text-gray-700 font-medium mb-1">Full Name</label>
+            <input type="text" formControlName="fullName"
+              class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+            <div *ngIf="adminForm.get('fullName')?.touched && adminForm.get('fullName')?.invalid"
+              class="text-red-500 text-sm mt-1">Name is required</div>
+          </div>
+
+          <!-- accountType -->
+          <div>
+            <label class="block text-gray-700 font-medium mb-1">accountType</label>
+            <select name="" id=""  formControlName="accountType"
+            class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            <option value="Admin" selected>Admin</option>
+            <option value="manager">Restaurant Manager</option>
+            <option value="staff">Supermarket Manager</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Password -->
+        <div *ngIf="!mode" >
+          <label class="block text-gray-700 font-medium mb-1">Password</label>
+          <input type="text" formControlName="password"
+          class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+          <div *ngIf="adminForm.get('password')?.touched && adminForm.get('password')?.invalid"
+          class="text-red-500 text-sm mt-1">Name is required</div>
+        </div>
+
+        <!-- email -->
+        <div>
+          <label class="block text-gray-700 font-medium mb-1">Email</label>
+          <input type="text" formControlName="email"
+            class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+          <div *ngIf="adminForm.get('email')?.touched && adminForm.get('email')?.invalid"
+            class="text-red-500 text-sm mt-1">Email is required</div>
+        </div>
+      </div>
+
+
+        <!-- Submit -->
+        <div class="flex justify-end mt-6">
+          <button type="submit" [disabled]="adminForm.invalid"
+            class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium px-6 py-2 rounded-lg shadow-md transition-all duration-300">
+            {{ mode ? 'Update' : 'Save' }}
+          </button>
+        </div>
+
+      </form>
+
+
+    </div>
+  </div>
+
+
+
+  <div class="overflow-x-auto bg-white rounded-xl shadow-lg border border-gray-200">
+    <table class="w-full text-center text-gray-700">
+      <thead>
+        <tr class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm md:text-base">
+          <th class="px-4 py-3">#</th>
+          <th class="px-4 py-3">Full Name</th>
+          <th class="px-4 py-3">Email</th>
+          <th class="px-4 py-3">accountType</th>
+          <th class="px-4 py-3">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of admins; let i = index"
+          class="hover:bg-gray-100 transition text-sm md:text-base border-b last:border-none">
+          <td class="px-4 py-3">{{ i + 1 }}</td>
+          <td class="px-4 py-3 font-semibold">{{ user.fullName }}</td>
+          <td class="px-4 py-3">{{ user.email || 'N/A' }}</td>
+          <td class="px-4 py-3">{{ user.accountType || 'N/A' }}</td>
+          <td class="px-4 py-3">
+            <button (click)="openEditModal(user)" class="text-blue-600 hover:text-blue-800 transition">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button (click)="deleteRestaurant(user._id)" class="text-red-600 hover:text-red-800 mx-3 transition">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+            <button (click)="openViewModal(user)" class="text-green-600 hover:text-green-800  transition">
+              <i class="fas fa-eye"></i>
+
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+
+
+
+
+</section>

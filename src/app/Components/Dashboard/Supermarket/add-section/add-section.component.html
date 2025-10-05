@@ -1,0 +1,501 @@
+<section class="mt-[40px]">
+  <!-- Add Admin Button -->
+  <div class="mb-6 text-right ">
+    <button (click)="openAddModal()" class="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 transition">
+      + Add Section
+    </button>
+  </div>
+
+  <!-- Modal -->
+  <div *ngIf="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+    <div
+      class="bg-white p-8 rounded-2xl shadow-2xl w-[70%] max-h-[90vh] overflow-y-auto scrrolHide mx-auto relative transition-transform duration-300 scale-100">
+
+      <!-- Header -->
+      <div class="flex items-center mb-6" [ngClass]="{ 'justify-between': !show, 'justify-end': show }">
+        <h2 class="text-2xl font-bold text-gray-800" *ngIf="!show">
+          {{ mode ? 'Edit Section' : 'Add Section' }}
+        </h2>
+        <div
+          class="bg-red-500 hover:bg-red-600 text-white w-8 h-8 flex items-center justify-center rounded-full shadow-md cursor-pointer transition-all duration-300"
+          (click)="closeModal()">
+          ✕
+        </div>
+      </div>
+
+      <!-- Form -->
+      <form [formGroup]="sectionForm" (ngSubmit)="onSubmit()" class="space-y-6">
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+        </div>
+        <!-- Name -->
+        <div formGroupName="name" class="mb-6">
+          <h3 class="text-lg font-semibold text-gray-800 mb-3">Name</h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+            <!-- English -->
+            <div>
+              <label class="block text-gray-600 font-medium mb-1">English</label>
+              <input type="text" formControlName="en" placeholder="Enter English Name"
+                class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+              <div *ngIf="sectionForm.get('name.en')?.touched && sectionForm.get('name.en')?.invalid"
+                class="text-red-500 text-sm mt-1">English name is required</div>
+            </div>
+
+            <!-- Arabic -->
+            <div>
+              <label class="block text-gray-600 font-medium mb-1">Arabic</label>
+              <input type="text" formControlName="ar" placeholder="أدخل الاسم بالعربية"
+                class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+              <div *ngIf="sectionForm.get('name.ar')?.touched && sectionForm.get('name.ar')?.invalid"
+                class="text-red-500 text-sm mt-1">Arabic name is required</div>
+            </div>
+
+            <!-- French -->
+            <div>
+              <label class="block text-gray-600 font-medium mb-1">French</label>
+              <input type="text" formControlName="fr" placeholder="Entrez le nom en français"
+                class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+              <div *ngIf="sectionForm.get('name.fr')?.touched && sectionForm.get('name.fr')?.invalid"
+                class="text-red-500 text-sm mt-1">French name is required</div>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- Description -->
+        <div formGroupName="description" class="mb-6">
+          <h3 class="text-lg font-semibold text-gray-800 mb-3">Description</h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+            <!-- English -->
+            <div>
+              <label class="block text-gray-600 font-medium mb-1">English</label>
+              <textarea rows="3" formControlName="en" placeholder="Enter English Description"
+                class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+              <div *ngIf="sectionForm.get('description.en')?.touched && sectionForm.get('description.en')?.invalid"
+                class="text-red-500 text-sm mt-1">English description is required</div>
+            </div>
+
+            <!-- Arabic -->
+            <div>
+              <label class="block text-gray-600 font-medium mb-1">Arabic</label>
+              <textarea rows="3" formControlName="ar" placeholder="أدخل الوصف بالعربية"
+                class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+              <div *ngIf="sectionForm.get('description.ar')?.touched && sectionForm.get('description.ar')?.invalid"
+                class="text-red-500 text-sm mt-1">Arabic description is required</div>
+            </div>
+
+            <!-- French -->
+            <div>
+              <label class="block text-gray-600 font-medium mb-1">French</label>
+              <textarea rows="3" formControlName="fr" placeholder="Entrez la description en français"
+                class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+              <div *ngIf="sectionForm.get('description.fr')?.touched && sectionForm.get('description.fr')?.invalid"
+                class="text-red-500 text-sm mt-1">French description is required</div>
+            </div>
+          </div>
+        </div>
+
+
+
+
+        <!-- Submit -->
+        <div class="flex justify-end mt-6">
+          <button type="submit" [disabled]="sectionForm.invalid"
+            class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium px-6 py-2 rounded-lg shadow-md transition-all duration-300">
+            {{ mode ? 'Update' : 'Save' }}
+          </button>
+        </div>
+
+      </form>
+
+
+    </div>
+  </div>
+
+
+
+  <div class="overflow-x-auto bg-white rounded-xl shadow-lg border border-gray-200">
+    <table class="w-full text-center text-gray-700">
+      <thead>
+        <tr class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm md:text-base">
+          <th class="px-4 py-3">#</th>
+          <th class="px-4 py-3">Name</th>
+          <th class="px-4 py-3">Description</th>
+          <th class="px-4 py-3">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of supermarket; let i = index"
+          class="hover:bg-gray-100 transition text-sm md:text-base border-b last:border-none">
+          <td class="px-4 py-3">{{ i + 1 }}</td>
+          <td class="px-4 py-3 font-semibold">{{ user.name.en }}</td>
+          <td class="px-4 py-3">{{ user.description.en || 'N/A' }}</td>
+          <td class="px-4 py-3">
+            <button (click)="openEditModal(user)" class="text-blue-600 hover:text-blue-800 transition">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button (click)="deleteRestaurant(user._id)" class="text-red-600 hover:text-red-800 mx-3 transition">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+            <button (click)="openViewModal(user)" class="text-green-600 hover:text-green-800  transition">
+              <i class="fas fa-eye"></i>
+            </button>
+            <!-- <button routerLink="/add-product/{{ user._id }}" class="bg-blue-700 text-white rounded-lg p-2 mx-3  transition">
+              <i class="fas fa-plus"></i>
+              <span class="mx-1">Add Product</span>
+            </button> -->
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+
+
+
+
+</section>
+
+
+
+<!-- Modal -->
+<div *ngIf="viewData"
+  class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-start pt-10 z-50 overflow-auto">
+  <div class="bg-white p-6 rounded-2xl shadow-2xl w-[90%] max-w-5xl max-h-[90vh] overflow-y-auto relative">
+
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-2xl font-bold text-gray-800">
+        Section Details
+      </h2>
+      <button
+        class="bg-red-500 hover:bg-red-600 text-white w-8 h-8 flex items-center justify-center rounded-full shadow-md"
+        (click)="closeData()">
+        ✕
+      </button>
+    </div>
+
+    <!-- Section Info -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div>
+        <h3 class="font-semibold text-gray-700 mb-1">Name</h3>
+        <p>EN: {{ selectedSection.name.en }}</p>
+        <p>AR: {{ selectedSection.name.ar }}</p>
+        <p>FR: {{ selectedSection.name.fr }}</p>
+      </div>
+
+      <div>
+        <h3 class="font-semibold text-gray-700 mb-1">Description</h3>
+        <p>EN: {{ selectedSection.description.en }}</p>
+        <p>AR: {{ selectedSection.description.ar }}</p>
+        <p>FR: {{ selectedSection.description.fr }}</p>
+      </div>
+
+      <div *ngIf="selectedSection.images?.length">
+        <h3 class="font-semibold text-gray-700 mb-1">Images</h3>
+        <div class="flex gap-2">
+          <img *ngFor="let img of selectedSection.images" [src]="img.secure_url" alt="Section Image"
+            class="w-24 h-24 object-cover rounded-md border" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Products Table -->
+    <div>
+      <div class="flex justify-end mb-4">
+        <button (click)="openAddProductModal()" class="bg-blue-700 text-white rounded-lg p-2 mx-3  transition">
+          <i class="fas fa-plus"></i>
+          <span class="mx-1">Add Product</span>
+        </button>
+      </div>
+      <h3 class="text-xl font-semibold mb-4">Products</h3>
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="bg-gray-100 text-center ">
+            <th class="px-4 py-2 border">Name (EN)</th>
+            <th class="px-4 py-2 border">Price</th>
+            <th class="px-4 py-2 border">Stock</th>
+            <th class="px-4 py-2 border">Discount</th>
+            <th class="px-4 py-2 border">Image</th>
+            <th class="px-4 py-2 border">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let product of selectedSection.products" class="hover:bg-gray-50 text-center ">
+            <td class="px-4 py-2 border">{{ product.name.en }}</td>
+            <td class="px-4 py-2 border">{{ product.price | currency:'EGP' }}</td>
+            <td class="px-4 py-2 border">{{ product.stock }}</td>
+            <td class="px-4 py-2 border">{{ product.discount }}%</td>
+            <td class="px-4 py-2 border">
+              <img *ngIf="product.images?.length" [src]="product.images[0].secure_url" alt="Product Image"
+                class="w-16 h-16 object-cover rounded" />
+            </td>
+            <td class="px-4 py-2 border">
+              <button class="bg-green-600 text-white px-3 py-1 rounded-md" (click)="openProductModal(product)">
+                View
+              </button>
+              <button class="bg-red-600 text-white px-3 py-1 rounded-md mx-2 " >
+                Delete
+              </button>
+              <button  class="bg-blue-600 text-white px-3 py-1 rounded-md" (click)="openEditProductModal(product)" >
+                Edit
+              </button>
+
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+
+
+<!-- Product Modal -->
+<div *ngIf="showModelProduct"
+  class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-start pt-10 z-50 overflow-auto">
+  <div class="bg-white p-6 rounded-2xl shadow-2xl w-[90%] max-w-4xl max-h-[90vh] overflow-y-auto relative">
+
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-2xl font-bold text-gray-800">Product Details</h2>
+      <button
+        class="bg-red-500 hover:bg-red-600 text-white w-8 h-8 flex items-center justify-center rounded-full shadow-md"
+        (click)="closeProductModal()">
+        ✕
+      </button>
+    </div>
+
+    <!-- Product Info -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+      <!-- Text Info -->
+      <div class="space-y-4">
+        <!-- Name -->
+        <div>
+          <h3 class="font-semibold text-gray-700 mb-1">Name</h3>
+          <p><span class="font-medium">EN:</span> {{ selectedProduct.name.en }}</p>
+          <p><span class="font-medium">AR:</span> {{ selectedProduct.name.ar }}</p>
+          <p><span class="font-medium">FR:</span> {{ selectedProduct.name.fr }}</p>
+        </div>
+
+        <!-- Description -->
+        <div>
+          <h3 class="font-semibold text-gray-700 mb-1">Description</h3>
+          <p><span class="font-medium">EN:</span> {{ selectedProduct.description.en }}</p>
+          <p><span class="font-medium">AR:</span> {{ selectedProduct.description.ar }}</p>
+          <p><span class="font-medium">FR:</span> {{ selectedProduct.description.fr }}</p>
+        </div>
+
+        <!-- Price & Discount & Stock -->
+        <div class="grid grid-cols-3 gap-4">
+          <div>
+            <h3 class="font-semibold text-gray-700 mb-1">Price</h3>
+            <p>{{ selectedProduct.price | currency:'EGP' }}</p>
+          </div>
+          <div>
+            <h3 class="font-semibold text-gray-700 mb-1">Discount</h3>
+            <p>{{ selectedProduct.discount }}%</p>
+          </div>
+          <div>
+            <h3 class="font-semibold text-gray-700 mb-1">Stock</h3>
+            <p>{{ selectedProduct.stock }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Images Carousel -->
+      <div *ngIf="selectedProduct.images?.length">
+        <h3 class="font-semibold text-gray-700 mb-2">Images</h3>
+        <div class="flex space-x-4 overflow-x-auto py-2">
+          <div *ngFor="let img of selectedProduct.images" class="flex-shrink-0">
+            <img [src]="img.secure_url" alt="Product Image" class="w-40 h-40 object-cover rounded-md border" />
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Add Product Modal -->
+
+<div *ngIf="showModelAddProduct">
+
+  <!-- Modal -->
+  <div class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+    <div
+      class="bg-white p-8 rounded-2xl shadow-2xl w-[70%] max-h-[90vh] overflow-y-auto scrrolHide mx-auto relative transition-transform duration-300 scale-100">
+
+      <!-- Header -->
+      <div class="flex items-center mb-6" [ngClass]="{ 'justify-between': !show, 'justify-end': show }">
+        <h2 class="text-2xl font-bold text-gray-800" *ngIf="!show">
+          {{ mode ? 'Edit Product' : 'Add Product' }}
+        </h2>
+        <div
+          class="bg-red-500 hover:bg-red-600 text-white w-8 h-8 flex items-center justify-center rounded-full shadow-md cursor-pointer transition-all duration-300"
+          (click)="closeAddProductModal()">
+          ✕
+        </div>
+      </div>
+
+
+      <!-- Form -->
+      <form [formGroup]="productForm" (ngSubmit)="onSubmitAddProduct()" class="space-y-6">
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+        </div>
+        <!-- Name -->
+        <div formGroupName="name" class="mb-6">
+          <h3 class="text-lg font-semibold text-gray-800 mb-3">Name</h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+            <!-- English -->
+            <div>
+              <label class="block text-gray-600 font-medium mb-1">English</label>
+              <input type="text" formControlName="en" placeholder="Enter English Name"
+                class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+              <div *ngIf="productForm.get('name.en')?.touched && productForm.get('name.en')?.invalid"
+                class="text-red-500 text-sm mt-1">English name is required</div>
+            </div>
+
+            <!-- Arabic -->
+            <div>
+              <label class="block text-gray-600 font-medium mb-1">Arabic</label>
+              <input type="text" formControlName="ar" placeholder="أدخل الاسم بالعربية"
+                class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+              <div *ngIf="productForm.get('name.ar')?.touched && productForm.get('name.ar')?.invalid"
+                class="text-red-500 text-sm mt-1">Arabic name is required</div>
+            </div>
+
+            <!-- French -->
+            <div>
+              <label class="block text-gray-600 font-medium mb-1">French</label>
+              <input type="text" formControlName="fr" placeholder="Entrez le nom en français"
+                class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+              <div *ngIf="productForm.get('name.fr')?.touched && productForm.get('name.fr')?.invalid"
+                class="text-red-500 text-sm mt-1">French name is required</div>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- Description -->
+        <div formGroupName="description" class="mb-6">
+          <h3 class="text-lg font-semibold text-gray-800 mb-3">Description</h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+            <!-- English -->
+            <div>
+              <label class="block text-gray-600 font-medium mb-1">English</label>
+              <textarea rows="3" formControlName="en" placeholder="Enter English Description"
+                class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+              <div *ngIf="productForm.get('description.en')?.touched && productForm.get('description.en')?.invalid"
+                class="text-red-500 text-sm mt-1">English description is required</div>
+            </div>
+
+            <!-- Arabic -->
+            <div>
+              <label class="block text-gray-600 font-medium mb-1">Arabic</label>
+              <textarea rows="3" formControlName="ar" placeholder="أدخل الوصف بالعربية"
+                class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+              <div *ngIf="productForm.get('description.ar')?.touched && productForm.get('description.ar')?.invalid"
+                class="text-red-500 text-sm mt-1">Arabic description is required</div>
+            </div>
+
+            <!-- French -->
+            <div>
+              <label class="block text-gray-600 font-medium mb-1">French</label>
+              <textarea rows="3" formControlName="fr" placeholder="Entrez la description en français"
+                class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+              <div *ngIf="productForm.get('description.fr')?.touched && productForm.get('description.fr')?.invalid"
+                class="text-red-500 text-sm mt-1">French description is required</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Price, Stock, Discount -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-gray-600 font-medium mb-1">Price</label>
+            <input type="number" formControlName="price" placeholder="Enter Price"
+              class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+            <div *ngIf="productForm.get('price')?.touched && productForm.get('price')?.invalid"
+              class="text-red-500 text-sm mt-1">Price is required and must be positive</div>
+          </div>
+
+          <div>
+            <label class="block text-gray-600 font-medium mb-1">Stock</label> <!-- Stock -->
+            <input type="number" formControlName="stock" placeholder="Enter Stock"
+              class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus  :ring-blue-500 focus:outline-none" />
+            <div *ngIf="productForm.get('stock')?.touched && productForm.get('stock')?.invalid"
+              class="text-red-500 text-sm mt-1">Stock is required and must be positive</div>
+          </div>
+
+          <div>
+            <label class="block text-gray-600 font-medium mb-1">Discount (%)</label> <!-- Discount -->
+            <input type="number" formControlName="discount" placeholder="Enter Discount"
+              class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+            <div *ngIf="productForm.get('discount')?.touched && productForm.get('discount')?.invalid"
+              class="text-red-500 text-sm mt-1">Discount must be between 0 and 100</div>
+          </div>
+        </div>
+
+        <!-- Multiple Images -->
+        <div class="w-full flex flex-col mb-4">
+          <label class="text-[18px] font-medium text-gray-700 mb-1">Upload Images</label>
+
+          <div class="relative border-2 border-dashed border-blue-500 rounded-lg p-4 flex flex-col items-center justify-center
+    cursor-pointer bg-blue-50 transition h-40">
+
+            <!-- Input -->
+            <input type="file" accept=".jpg,.jpeg,.png,.gif" multiple (change)="onImagesSelected($event)"
+              class="absolute inset-0 opacity-0 cursor-pointer" />
+
+            <!-- لو مفيش صور -->
+            <ng-container *ngIf="imagePreviews.length === 0">
+              <svg class="w-12 h-12 text-blue-500 mb-2" fill="none" stroke="currentColor" stroke-width="2"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+              </svg>
+              <p class="text-gray-600">Click to upload Images</p>
+            </ng-container>
+
+            <!-- لو في صور -->
+            <ng-container *ngIf="imagePreviews.length > 0">
+              <div class="flex flex-wrap gap-3 justify-center">
+                <div *ngFor="let preview of imagePreviews; let i = index" class="relative w-24 h-24">
+                  <img [src]="preview" class="w-full h-full object-cover rounded-lg border border-gray-300 shadow">
+                  <button *ngIf="!viewData" type="button" (click)="onRemoveImage(i, $event)" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center
+                  justify-center hover:bg-red-600 transition">✕
+                  </button>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+
+
+
+
+        <!-- Submit -->
+        <div class="flex justify-end mt-6">
+          <button type="submit" [disabled]="productForm.invalid"
+            class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium px-6 py-2 rounded-lg shadow-md transition-all duration-300">
+            {{ mode ? 'Update' : 'Save' }}
+          </button>
+        </div>
+
+      </form>
+
+
+    </div>
+  </div>
+
+
+</div>

@@ -1,0 +1,24 @@
+<!-- Main Layout -->
+<div class="min-h-screen">
+
+  <!-- Navbar ) -->
+  <div class="fixed top-0 left-0 right-0 z-50 h-16 bg-white shadow">
+    <app-navbar></app-navbar>
+  </div>
+
+  <!-- Main Content  -->
+  <div class="flex pt-16 min-h-screen">
+
+    <!-- Sidebar -->
+    <div class="w-64 h-[calc(100vh-4rem)] fixed top-16 left-0 bg-gray-800 overflow-y-auto scrollbar-hide ">
+      <app-sidebar></app-sidebar>
+    </div>
+
+    <!-- Router Outlet  -->
+    <div class="flex-1 ml-64 mt-[20px] p-4">
+      <router-outlet></router-outlet>
+    </div>
+
+  </div>
+
+</div>

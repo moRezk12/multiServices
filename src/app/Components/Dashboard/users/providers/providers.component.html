@@ -1,0 +1,258 @@
+<section class="mt-10 px-4">
+
+  <!-- Tabs -->
+  <div class="flex flex-wrap gap-3 mb-6 border-b pb-2">
+    <button (click)="setActive('Doctor')"
+      [ngClass]="activeTab === 'Doctor' ? 'text-blue-600 border-b-2 border-blue-600 font-semibold' : 'text-gray-600'"
+      class="px-4 py-2 transition">
+      <i class="fas fa-user-md mr-2"></i> Doctor
+    </button>
+
+    <button (click)="setActive('Driver')"
+      [ngClass]="activeTab === 'Driver' ? 'text-blue-600 border-b-2 border-blue-600 font-semibold' : 'text-gray-600'"
+      class="px-4 py-2 transition">
+      <i class="fas fa-car mr-2"></i> Driver
+    </button>
+
+    <button (click)="setActive('Delivery')"
+      [ngClass]="activeTab === 'Delivery' ? 'text-blue-600 border-b-2 border-blue-600 font-semibold' : 'text-gray-600'"
+      class="px-4 py-2 transition">
+      <i class="fas fa-truck mr-2"></i> Delivery
+    </button>
+
+    <button (click)="setActive('Host')"
+      [ngClass]="activeTab === 'Host' ? 'text-blue-600 border-b-2 border-blue-600 font-semibold' : 'text-gray-600'"
+      class="px-4 py-2 transition">
+      <i class="fas fa-building mr-2"></i> Real Estate
+    </button>
+  </div>
+
+  <!-- Tables -->
+  <div class="overflow-x-auto bg-white rounded-xl shadow-lg border border-gray-200">
+
+    <!-- Doctor / Host Table -->
+    <table *ngIf="activeTab === 'Doctor' || activeTab === 'Host'" class="w-full text-sm md:text-base">
+      <thead class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-center">
+        <tr>
+          <th class="px-4 py-3">#</th>
+          <th class="px-4 py-3">Full Name</th>
+          <th class="px-4 py-3">Email</th>
+          <!-- <th class="px-4 py-3">Image</th> -->
+          <th class="px-4 py-3">Service Type</th>
+          <th class="px-4 py-3">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let doctor of providers; let i = index" class="border-b hover:bg-gray-50 text-center transition">
+          <td class="px-4 py-3">{{ i + 1 }}</td>
+          <td class="px-4 py-3 font-semibold">{{ doctor.fullName || 'N/A' }}</td>
+          <td class="px-4 py-3">{{ doctor.email || 'N/A' }}</td>
+          <!-- <td class="px-4 py-3">
+            <div *ngIf="doctor.nationalIdImage" class="w-12 h-12 rounded-full mx-auto overflow-hidden shadow">
+              <img [src]="doctor.nationalIdImage.secure_url" alt="Provider" class="w-full h-full object-cover">
+            </div>
+            <span *ngIf="!doctor.nationalIdImage" class="text-gray-400 text-sm">No Image</span>
+          </td> -->
+          <td class="px-4 py-3">
+            <span class="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+              {{ doctor.serviceType || 'N/A' }}
+            </span>
+          </td>
+          <td class="px-4 py-3">
+            <button (click)="openViewModal(doctor)"
+              class="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+              View
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Driver / Delivery Table -->
+    <table *ngIf="activeTab === 'Driver' || activeTab === 'Delivery'" class="w-full text-sm md:text-base">
+      <thead class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-center">
+        <tr>
+          <th class="px-4 py-3">#</th>
+          <th class="px-4 py-3">Full Name</th>
+          <th class="px-4 py-3">Email / Phone</th>
+          <!-- <th class="px-4 py-3">ID Image</th>
+          <th class="px-4 py-3">Car License</th>
+          <th class="px-4 py-3">Documents</th>
+          <th class="px-4 py-3">Profile</th>
+          <th class="px-4 py-3">Car Images</th>-->
+          <th class="px-4 py-3">Service Type</th>
+          <th class="px-4 py-3">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let driver of providers; let i = index" class="border-b hover:bg-gray-50 text-center transition">
+          <td class="px-4 py-3">{{ i + 1 }}</td>
+          <td class="px-4 py-3 font-semibold">{{ driver.fullName || 'N/A' }}</td>
+          <td class="px-4 py-3">{{ driver.email || driver.phone || 'N/A' }}</td>
+
+          <!-- ID Image -->
+          <!-- <td class="px-4 py-3">
+            <ng-container *ngIf="driver.nationalIdImage; else noImage">
+              <div class="w-12 h-12 rounded-full mx-auto overflow-hidden shadow">
+                <img [src]="driver.nationalIdImage.secure_url" class="w-full h-full object-cover" />
+              </div>
+            </ng-container>
+            <ng-template #noImage><span class="text-gray-400 text-sm">No Image</span></ng-template>
+          </td> -->
+
+          <!-- Car License -->
+          <!-- <td class="px-4 py-3">
+            <ng-container *ngIf="driver.carLicenseImage; else noImage">
+              <div class="w-12 h-12 rounded-full mx-auto overflow-hidden shadow">
+                <img [src]="driver.carLicenseImage.secure_url" class="w-full h-full object-cover" />
+              </div>
+            </ng-container>
+          </td> -->
+
+          <!-- Documents -->
+          <!-- <td class="px-4 py-3">
+            <ng-container *ngIf="driver.additionalDocuments; else noImage">
+              <div class="w-12 h-12 rounded-full mx-auto overflow-hidden shadow">
+                <img [src]="driver.additionalDocuments.secure_url" class="w-full h-full object-cover" />
+              </div>
+            </ng-container>
+          </td> -->
+
+          <!-- Profile Picture -->
+          <!-- <td class="px-4 py-3">
+            <ng-container *ngIf="driver.profiePicture; else noImage">
+              <div class="w-12 h-12 rounded-full mx-auto overflow-hidden shadow">
+                <img [src]="driver.profiePicture.secure_url" class="w-full h-full object-cover" />
+              </div>
+            </ng-container>
+          </td> -->
+
+          <!-- Car Images -->
+          <!-- <td class="px-4 py-3">
+            <div *ngIf="driver.carImages?.length; else noImage" class="flex gap-2 justify-center">
+              <div *ngFor="let item of driver.carImages" class="w-12 h-12 rounded-full overflow-hidden shadow">
+                <img [src]="item.secure_url" class="w-full h-full object-cover" />
+              </div>
+            </div>
+          </td> -->
+
+          <td class="px-4 py-3">
+            <span class="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+              {{ driver.serviceType || 'N/A' }}
+            </span>
+          </td>
+          <td class="px-4 py-3">
+            <button (click)="openViewModal(driver)"
+              class="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+              View
+            </button>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="mt-6 flex flex-col md:flex-row items-center justify-between gap-4">
+    <div class="text-gray-600 text-sm md:text-base font-medium">
+      Page {{ currentPage }} of {{ totalPages }} | Total Users: {{ totalUsers }}
+    </div>
+
+    <div class="flex flex-wrap items-center gap-2">
+      <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1"
+        class="px-3 py-2 rounded-lg border bg-gray-200 hover:bg-gray-300 transition disabled:opacity-50">
+        Previous
+      </button>
+
+      <ng-container *ngFor="let page of visiblePages">
+        <button (click)="goToPage(page)" class="px-4 py-2 rounded-lg border transition" [ngClass]="{
+                  'bg-blue-600 text-white': page === currentPage,
+                  'bg-gray-100 hover:bg-blue-200': page !== currentPage
+                }">
+          {{ page }}
+        </button>
+      </ng-container>
+
+      <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages"
+        class="px-3 py-2 rounded-lg border bg-gray-200 hover:bg-gray-300 transition disabled:opacity-50">
+        Next
+      </button>
+    </div>
+  </div>
+
+</section>
+
+
+<!-- Modal -->
+<!-- Modal -->
+<div *ngIf="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+  <div
+    class="bg-white p-8 rounded-2xl shadow-2xl w-[70%] max-h-[90vh] overflow-y-auto scrrolHide mx-auto relative transition-transform duration-300 scale-100">
+
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-2xl font-semibold text-gray-800">User Details</h2>
+      <div
+        class="bg-red-500 hover:bg-red-600 text-white w-8 h-8 flex items-center justify-center rounded-full shadow-md cursor-pointer transition-all duration-300"
+        (click)="closeModal()">
+        ✕
+      </div>
+    </div>
+
+    <!-- User Info -->
+    <div class="grid grid-cols-2 gap-6">
+      <!-- Text Info -->
+      <div class="space-y-3">
+        <p *ngIf="selectedProvider?.fullName"><span class="font-semibold text-gray-700">Full Name:</span> {{ selectedProvider.fullName }}</p>
+        <p *ngIf="selectedProvider?.email"><span class="font-semibold text-gray-700">Email:</span> {{ selectedProvider.email }}</p>
+        <p *ngIf="selectedProvider?.accountType"><span class="font-semibold text-gray-700">Account Type:</span> {{ selectedProvider.accountType }}</p>
+        <p *ngIf="selectedProvider?.serviceType"><span class="font-semibold text-gray-700">Service Type:</span> {{ selectedProvider.serviceType }}</p>
+        <p *ngIf="selectedProvider?.isConfirmed !== undefined">
+          <span class="font-semibold text-gray-700">Confirmed:</span>
+          <span [ngClass]="selectedProvider.isConfirmed ? 'text-green-600' : 'text-red-600'">
+            {{ selectedProvider.isConfirmed ? 'True' : 'False' }}
+          </span>
+        </p>
+      </div>
+
+      <!-- Profile Picture -->
+      <div *ngIf="selectedProvider?.profiePicture?.secure_url" class="flex flex-col items-center">
+        <h3 class="text-lg font-semibold text-gray-700 mb-3">Profile Picture</h3>
+        <img [src]="selectedProvider.profiePicture.secure_url" alt="Profile Picture"
+          class="w-40 h-40 object-cover rounded-full border shadow-md">
+      </div>
+    </div>
+
+    <!-- National ID -->
+    <div *ngIf="selectedProvider?.nationalIdImage?.secure_url" class="mt-6">
+      <h3 class="text-lg font-semibold text-gray-700 mb-3">National ID</h3>
+      <img [src]="selectedProvider.nationalIdImage.secure_url" alt="National ID"
+        class="w-72 h-56 object-cover rounded-lg border shadow-md">
+    </div>
+
+    <!-- Car License -->
+    <div *ngIf="selectedProvider?.carLicenseImage?.secure_url" class="mt-6">
+      <h3 class="text-lg font-semibold text-gray-700 mb-3">Car License</h3>
+      <img [src]="selectedProvider.carLicenseImage.secure_url" alt="Car License"
+        class="w-72 h-56 object-cover rounded-lg border shadow-md">
+    </div>
+
+    <!-- Additional Documents -->
+    <div *ngIf="selectedProvider?.additionalDocuments?.secure_url" class="mt-6">
+      <h3 class="text-lg font-semibold text-gray-700 mb-3">Additional Document</h3>
+      <img [src]="selectedProvider.additionalDocuments.secure_url" alt="Additional Document"
+        class="w-72 h-56 object-cover rounded-lg border shadow-md">
+    </div>
+
+    <!-- Car Images -->
+    <div *ngIf="selectedProvider?.carImages?.length > 0" class="mt-6">
+      <h3 class="text-lg font-semibold text-gray-700 mb-3">Car Images</h3>
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <div *ngFor="let carImg of selectedProvider.carImages" class="relative">
+          <img [src]="carImg.secure_url" alt="Car Image" class="w-full h-40 object-cover rounded-lg border shadow-md">
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+

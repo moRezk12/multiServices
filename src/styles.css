@@ -1,0 +1,23 @@
+/* You can add global styles to this file, and also import other style files */
+
+/* Tailwind CSS */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: linear-gradient(135deg, #f9fafb 25%, transparent 25%) -50px 0,
+              linear-gradient(225deg, #f9fafb 25%, transparent 25%) -50px 0,
+              linear-gradient(315deg, #f9fafb 25%, transparent 25%),
+              linear-gradient(45deg, #f9fafb 25%, transparent 25%);
+  background-size: 100px 100px;
+  background-color: #ffffff;
+}
+
