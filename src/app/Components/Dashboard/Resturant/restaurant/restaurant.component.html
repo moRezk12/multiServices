@@ -36,17 +36,6 @@
               class="text-red-500 text-sm mt-1">Name is required</div>
           </div>
 
-          <!-- Cuisine -->
-          <div>
-            <label class="block text-gray-700 font-medium mb-1">Cuisine</label>
-            <input type="text" formControlName="cuisine"
-              class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
-            <div *ngIf="restaurantForm.get('cuisine')?.touched && restaurantForm.get('cuisine')?.invalid"
-              class="text-red-500 text-sm mt-1">Cuisine is required</div>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <!-- Rating -->
           <div>
             <label class="block text-gray-700 font-medium mb-1">Rating (1-5)</label>
@@ -56,20 +45,19 @@
               class="text-red-500 text-sm mt-1">Rating must be between 1 and 5</div>
           </div>
 
-          <!-- Delivery Time -->
-          <div>
-            <label class="block text-gray-700 font-medium mb-1">Delivery Time</label>
-            <input type="text" formControlName="deliveryTime"
-              class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
-          </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- Distance -->
+
+          <!-- Phone -->
           <div>
-            <label class="block text-gray-700 font-medium mb-1">Distance</label>
-            <input type="text" formControlName="distance"
+            <label class="block text-gray-700 font-medium mb-1">Phone</label>
+            <input type="text" formControlName="phone" placeholder="+222010123456"
               class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+            <div *ngIf="restaurantForm.get('phone')?.touched && restaurantForm.get('phone')?.invalid"
+              class="text-red-500 text-sm mt-1">
+              Phone must start with +222 and be followed by 9 digits
+            </div>
           </div>
 
           <!-- Status -->
@@ -83,19 +71,13 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- Phone -->
-          <div>
-            <label class="block text-gray-700 font-medium mb-1">Phone</label>
-            <input type="text" formControlName="phone" placeholder="+201012345678"
-              class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
-            <div *ngIf="restaurantForm.get('phone')?.touched && restaurantForm.get('phone')?.invalid"
-              class="text-red-500 text-sm mt-1">Phone must start with +20 and be followed by 9 digits</div>
-          </div>
+        <div class="w-full">
+
+
 
           <!-- Website -->
           <div>
-            <label class="block text-gray-700 font-medium mb-1">Website</label>
+            <label class="block text-gray-700 font-medium mb-1">Location Resturant</label>
             <input type="url" formControlName="websiteLink" placeholder="https://example.com"
               class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
             <div *ngIf="restaurantForm.get('websiteLink')?.touched && restaurantForm.get('websiteLink')?.invalid"
@@ -179,7 +161,7 @@
 
         <!-- Submit -->
         <div class="flex justify-end mt-6">
-          <button type="submit" [disabled]="restaurantForm.invalid"
+          <button type="submit"  *ngIf="!show"
             class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium px-6 py-2 rounded-lg shadow-md transition-all duration-300">
             {{ mode ? 'Update' : 'Save' }}
           </button>
@@ -200,7 +182,7 @@
           <th class="px-4 py-3">#</th>
           <th class="px-4 py-3">Name</th>
           <th class="px-4 py-3">Phone</th>
-          <th class="px-4 py-3">cuisine</th>
+          <th class="px-4 py-3">Rating</th>
           <!-- <th class="px-4 py-3">rating</th>
           <th class="px-4 py-3">deliveryTime</th>
           <th class="px-4 py-3">distance</th>
@@ -214,7 +196,7 @@
           <td class="px-4 py-3">{{ i + 1 }}</td>
           <td class="px-4 py-3 font-semibold">{{ user.name }}</td>
           <td class="px-4 py-3">{{ user.phone || 'N/A' }}</td>
-          <td class="px-4 py-3">{{ user.cuisine || 'N/A' }}</td>
+          <td class="px-4 py-3">{{ user.rating || 'N/A' }}</td>
           <td class="px-4 py-3">
             <button (click)="openEditModal(user)" class="text-blue-600 hover:text-blue-800 transition">
               <i class="fas fa-edit"></i>
@@ -225,10 +207,12 @@
             <button (click)="openViewModal(user)" class="text-green-600 hover:text-green-800  transition">
               <i class="fas fa-eye"></i>
             </button>
-
-            <button (click)="openAddRoleModal(user._id)"
-              class="bg-blue-700 text-white rounded-lg p-2 mx-3  transition">
+            <button (click)="openAddRoleModal(user._id)" class="bg-blue-700 text-white rounded-lg p-2 mx-3  transition">
               + Add Role
+            </button>
+
+            <button [routerLink]="['/add-product', user._id]" class="bg-blue-700 text-white rounded-lg p-2 mx-3  transition">
+              + Add product
             </button>
 
           </td>
@@ -290,8 +274,9 @@
 
 
         </div>
-        <div *ngIf="accountType" >
-          <select formControlName="userId" class="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500">
+        <div *ngIf="accountType">
+          <select formControlName="userId"
+            class="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500">
             <option value="" disabled>Select user</option>
             <option *ngFor="let admin of admins" [value]="admin._id">
               {{ admin.fullName }}

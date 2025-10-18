@@ -12,8 +12,15 @@ export class SidebarComponent {
 
 links = [
   { url: '/admin', name: 'Admin', icon: 'fa-user' },
-  { url: '/restaurant', name: 'Restaurant', icon: 'fa-utensils' },
+  // { url: '/restaurant', name: 'Restaurant', icon: 'fa-utensils' },
   { url: '/add-supermarket', name: 'Supermarket', icon: 'fa-shopping-cart' },
+  {
+    name: 'Resturant',
+    children: [
+      { url: '/restaurant', name: 'Restaurant', icon: 'fa-utensils' },
+      // { url: '/add-product', name: 'Product', icon: 'fa-user-tie' }
+    ]
+  },
   {
     name: 'User',
     children: [

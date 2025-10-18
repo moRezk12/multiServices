@@ -1,0 +1,188 @@
+<section class="mt-[40px]">
+  <!-- Add Admin Button -->
+  <div class="mb-6 text-right ">
+    <button (click)="openAddModal()" class="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 transition">
+      + Add Product
+    </button>
+  </div>
+
+  <!-- Modal -->
+  <div *ngIf="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+    <div
+      class="bg-white p-8 rounded-2xl shadow-2xl w-[70%] max-h-[90vh] overflow-y-auto scrrolHide mx-auto relative transition-transform duration-300 scale-100">
+
+      <!-- Header -->
+      <div class="flex items-center mb-6" [ngClass]="{ 'justify-between': !show, 'justify-end': show }">
+        <h2 class="text-2xl font-bold text-gray-800" *ngIf="!show">
+          {{ mode ? 'Edit Product' : 'Add Product' }}
+        </h2>
+        <div
+          class="bg-red-500 hover:bg-red-600 text-white w-8 h-8 flex items-center justify-center rounded-full shadow-md cursor-pointer transition-all duration-300"
+          (click)="closeModal()">
+          ✕
+        </div>
+      </div>
+
+      <!-- Form -->
+      <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="space-y-6">
+
+        <div class="w-full">
+          <!-- Name -->
+          <div>
+            <label class="block text-gray-700 font-medium mb-1">Name</label>
+            <input type="text" formControlName="name"
+              class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+            <div *ngIf="productForm.get('name')?.touched && productForm.get('name')?.invalid"
+              class="text-red-500 text-sm mt-1">Name is required</div>
+          </div>
+
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Price -->
+          <div>
+            <label class="block text-gray-700 font-medium mb-1">Price</label>
+            <input type="number" formControlName="price"
+              class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+            <div *ngIf="productForm.get('price')?.touched && productForm.get('price')?.invalid"
+              class="text-red-500 text-sm mt-1">
+              Price is required
+            </div>
+          </div>
+
+          <!-- Discount -->
+          <div>
+            <label class="block text-gray-700 font-medium mb-1">Discount</label>
+            <input type="text" formControlName="discount" placeholder="10%"
+              class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+            <div *ngIf="productForm.get('discount')?.touched && productForm.get('discount')?.invalid"
+              class="text-red-500 text-sm mt-1">
+              Discount is required
+            </div>
+          </div>
+
+
+        </div>
+
+
+        <!-- Description -->
+        <div>
+          <label class="block text-gray-700 font-medium mb-1">Description</label>
+          <textarea rows="3" formControlName="description"
+            class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+        </div>
+
+        <!-- Multiple Images -->
+<!-- Multiple Images -->
+<div class="w-full flex flex-col">
+  <label class="text-[18px] font-medium text-gray-700 mb-1">Upload Menu Images</label>
+
+  <div
+    class="relative border-2 border-dashed border-blue-500 rounded-lg p-4 flex flex-col items-center justify-center
+           cursor-pointer bg-blue-50 transition min-h-40"
+  >
+    <!-- Input -->
+    <input
+      type="file"
+      multiple
+      accept=".jpg,.jpeg,.png,.gif"
+      (change)="onImagesSelected($event)"
+      class="absolute inset-0 opacity-0 cursor-pointer"
+      *ngIf="menuImagePreviews.length < 3"
+    />
+
+    <!-- لو مفيش صور -->
+    <ng-container *ngIf="menuImagePreviews.length === 0">
+      <svg
+        class="w-12 h-12 text-blue-500 mb-2"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        viewBox="0 0 24 24"
+      >
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+      </svg>
+      <p class="text-gray-600">Click to upload Menu Images (Max: 3)</p>
+    </ng-container>
+
+    <!-- لو في صور -->
+    <div class="flex gap-2 mt-2 flex-wrap">
+      <div *ngFor="let img of menuImagePreviews; let i = index" class="relative w-24 h-24 group">
+        <img
+          [src]="img"
+          class="w-full h-full object-cover rounded-lg border border-gray-300 shadow"
+        />
+
+        <!-- زرار الحذف -->
+        <button
+          type="button"
+          (click)="onRemoveMenuImage($event, i)"
+          class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center
+                 justify-center hover:bg-red-600 transition opacity-90 group-hover:opacity-100"
+        >
+          ✕
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+        <!-- Submit -->
+        <div class="flex justify-end mt-6">
+          <button type="submit"  *ngIf="!show"
+            class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium px-6 py-2 rounded-lg shadow-md transition-all duration-300">
+            {{ mode ? 'Update' : 'Save' }}
+          </button>
+        </div>
+
+      </form>
+
+
+    </div>
+  </div>
+
+
+
+  <div class="overflow-x-auto bg-white rounded-xl shadow-lg border border-gray-200">
+    <table class="w-full text-center text-gray-700">
+      <thead>
+        <tr class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm md:text-base">
+          <th class="px-4 py-3">#</th>
+          <th class="px-4 py-3">Name</th>
+          <th class="px-4 py-3">Price</th>
+          <th class="px-4 py-3">Discount</th>
+          <th class="px-4 py-3">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let product of Products; let i = index"
+          class="hover:bg-gray-100 transition text-sm md:text-base border-b last:border-none">
+          <td class="px-4 py-3">{{ i + 1 }}</td>
+          <td class="px-4 py-3 font-semibold">{{ product.name }}</td>
+          <td class="px-4 py-3">{{ product.price || 'N/A' }}</td>
+          <td class="px-4 py-3">{{ product.discount || 'N/A' }}</td>
+          <td class="px-4 py-3">
+            <button (click)="openEditModal(product)" class="text-blue-600 hover:text-blue-800 transition">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button (click)="deleteRestaurant(product._id)" class="text-red-600 hover:text-red-800 mx-3 transition">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+            <button (click)="openViewModal(product)" class="text-green-600 hover:text-green-800  transition">
+              <i class="fas fa-eye"></i>
+            </button>
+
+
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+
+
+
+
+</section>

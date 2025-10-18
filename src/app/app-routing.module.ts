@@ -8,11 +8,12 @@ import { authGuard } from './Core/Guards/auth.guard';
 
 import { ProvidersComponent } from './Components/Dashboard/users/providers/providers.component';
 import { CustomerComponent } from './Components/Dashboard/users/customer/customer.component';
-import { RestaurantComponent } from './Components/Dashboard/restaurant/restaurant.component';
 import { AddSupermarketComponent } from './Components/Dashboard/Supermarket/add-supermarket/add-supermarket.component';
 import { AddSectionComponent } from './Components/Dashboard/Supermarket/add-section/add-section.component';
-import { AddProductComponent } from './Components/Dashboard/Supermarket/add-product/add-product.component';
 import { AdminComponent } from './Components/Dashboard/admin/admin.component';
+import { RestaurantComponent } from './Components/Dashboard/Resturant/restaurant/restaurant.component';
+import { AddProductComponent } from './Components/Dashboard/Resturant/add-product/add-product.component';
+import { ProductSectionComponent } from './Components/Dashboard/Supermarket/product-section/product-section.component';
 
 const routes: Routes = [
 
@@ -34,6 +35,7 @@ const routes: Routes = [
       {path : 'add-supermarket' , component : AddSupermarketComponent , canActivate : [authGuard] },
       {path : 'add-section/:id' , component : AddSectionComponent , canActivate : [authGuard] },
       {path : 'add-product/:id' , component : AddProductComponent , canActivate : [authGuard] },
+      {path : 'add-productSection/:id' , component : ProductSectionComponent , canActivate : [authGuard] },
 
 
     ],
