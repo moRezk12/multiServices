@@ -26,6 +26,7 @@ import { AdminComponent } from './Components/Dashboard/admin/admin.component';
 import { RestaurantComponent } from './Components/Dashboard/Resturant/restaurant/restaurant.component';
 import { AddProductComponent } from './Components/Dashboard/Resturant/add-product/add-product.component';
 import { ProductSectionComponent } from './Components/Dashboard/Supermarket/product-section/product-section.component';
+import { PrivacyPolicyComponent } from './Components/Dashboard/privacy-policy/privacy-policy.component';
 
 @NgModule({
   declarations: [
@@ -44,7 +45,8 @@ import { ProductSectionComponent } from './Components/Dashboard/Supermarket/prod
     AddSectionComponent,
     AddProductComponent,
     AdminComponent,
-    ProductSectionComponent
+    ProductSectionComponent,
+    PrivacyPolicyComponent
   ],
   imports: [
     BrowserModule,

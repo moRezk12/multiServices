@@ -14,6 +14,7 @@ import { AdminComponent } from './Components/Dashboard/admin/admin.component';
 import { RestaurantComponent } from './Components/Dashboard/Resturant/restaurant/restaurant.component';
 import { AddProductComponent } from './Components/Dashboard/Resturant/add-product/add-product.component';
 import { ProductSectionComponent } from './Components/Dashboard/Supermarket/product-section/product-section.component';
+import { PrivacyPolicyComponent } from './Components/Dashboard/privacy-policy/privacy-policy.component';
 
 const routes: Routes = [
 
@@ -36,6 +37,7 @@ const routes: Routes = [
       {path : 'add-section/:id' , component : AddSectionComponent , canActivate : [authGuard] },
       {path : 'add-product/:id' , component : AddProductComponent , canActivate : [authGuard] },
       {path : 'add-productSection/:id' , component : ProductSectionComponent , canActivate : [authGuard] },
+      {path : 'privacy-policy' , component : PrivacyPolicyComponent , canActivate : [authGuard] },
 
 
     ],

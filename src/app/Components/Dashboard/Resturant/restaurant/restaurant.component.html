@@ -54,9 +54,15 @@
             <label class="block text-gray-700 font-medium mb-1">Phone</label>
             <input type="text" formControlName="phone" placeholder="+222010123456"
               class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
-            <div *ngIf="restaurantForm.get('phone')?.touched && restaurantForm.get('phone')?.invalid"
-              class="text-red-500 text-sm mt-1">
-              Phone must start with +222 and be followed by 9 digits
+           <div
+              *ngIf="restaurantForm.get('phone')?.invalid && (restaurantForm.get('phone')?.dirty || restaurantForm.get('phone')?.touched)"
+              class="text-red-600 text-sm mt-1">
+              <div *ngIf="restaurantForm.get('phone')?.errors?.['required']">
+                Phone number is required.
+              </div>
+              <div *ngIf="restaurantForm.get('phone')?.errors?.['pattern']">
+                Phone number must start with +222 or 20 followed by 8 digits.
+              </div>
             </div>
           </div>
 

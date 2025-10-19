@@ -1,0 +1,125 @@
+<section class="mt-[40px]">
+  <!-- Add Admin Button -->
+  <div class="mb-6 text-right ">
+    <button (click)="openAddModal()" class="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 transition">
+      + Add Policy
+    </button>
+  </div>
+
+  <!-- Modal -->
+  <div *ngIf="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+    <div
+      class="bg-white p-8 rounded-2xl shadow-2xl w-[70%] max-h-[90vh] overflow-y-auto scrrolHide mx-auto relative transition-transform duration-300 scale-100">
+
+      <!-- Header -->
+      <div class="flex items-center mb-6" [ngClass]="{ 'justify-between': !show, 'justify-end': show }">
+        <h2 class="text-2xl font-bold text-gray-800" *ngIf="!show">
+          {{ mode ? 'Edit Policy' : 'Add Policy' }}
+        </h2>
+        <div
+          class="bg-red-500 hover:bg-red-600 text-white w-8 h-8 flex items-center justify-center rounded-full shadow-md cursor-pointer transition-all duration-300"
+          (click)="closeModal()">
+          ✕
+        </div>
+      </div>
+
+      <!-- Form -->
+      <form [formGroup]="privacyPolicyForm" (ngSubmit)="onSubmit()" class="space-y-6">
+
+        <!-- WhatsApp Number -->
+        <div>
+          <label class="block text-gray-700 font-medium mb-1">WhatsApp Number</label>
+          <input type="text" formControlName="whatsappNumber"
+            class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+          <div
+            *ngIf="privacyPolicyForm.get('whatsappNumber')?.touched && privacyPolicyForm.get('whatsappNumber')?.invalid"
+            class="text-red-500 text-sm mt-1">
+            WhatsApp number is required and must be valid
+          </div>
+        </div>
+
+        <!-- Privacy Policy Items -->
+        <div>
+          <label class="block text-gray-700 font-medium mb-1">Privacy Policy</label>
+
+          <div formArrayName="privacyPolicy" class="space-y-3">
+            <div *ngFor="let item of privacyPolicyArray.controls; let i = index" class="flex items-center gap-2">
+              <input type="text" [formControlName]="i"
+                class="flex-1 border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                placeholder="Enter policy statement" />
+              <button type="button" (click)="removePolicy(i)" class="text-red-500 hover:text-red-700 font-bold text-lg">
+                &times;
+              </button>
+            </div>
+          </div>
+
+          <!-- Add new policy -->
+          <button type="button" (click)="addPolicy()"
+            class="mt-3 bg-green-600 text-white px-4 py-2 rounded-lg transition-all duration-300">
+            + Add Policy
+          </button>
+        </div>
+
+        <!-- Submit -->
+        <div class="flex justify-end mt-6">
+          <button type="submit"
+            class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium px-6 py-2 rounded-lg shadow-md transition-all duration-300">
+            Save
+          </button>
+        </div>
+
+      </form>
+
+
+
+    </div>
+  </div>
+
+
+
+  <div class="overflow-x-auto bg-white rounded-xl shadow-lg border border-gray-200">
+    <table class="w-full text-left border-collapse">
+      <thead>
+        <tr class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm md:text-base">
+          <th class="px-4 py-3">WhatsApp Number</th>
+          <th class="px-4 py-3">Privacy Policy</th>
+          <th class="px-4 py-3">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="privacyPolicies" class="hover:bg-gray-100 transition text-sm md:text-base border-b last:border-none">
+          <!-- رقم الواتساب -->
+          <td class="px-4 py-3 font-semibold">
+            {{ privacyPolicies?.whatsappNumber }}
+          </td>
+
+          <!-- عرض عناصر سياسة الخصوصية -->
+          <td class="px-4 py-3">
+            <ul class="list-disc list-inside space-y-1">
+              <li *ngFor="let policy of privacyPolicies?.privacyPolicy">
+                {{ policy }}
+              </li>
+            </ul>
+          </td>
+
+          <td class="px-4 py-3">
+            <button
+              (click)="deletePrivacy()"
+              class="flex items-center gap-2 bg-red-600 p-[8px] rounded-[10px] text-white mx-3 transition"
+            >
+              <i class="fas fa-trash-alt"></i>
+              Delete
+            </button>
+          </td>
+        </tr>
+      </tbody>
+
+    </table>
+
+  </div>
+
+
+
+
+
+</section>

@@ -16,6 +16,12 @@ export class SupermarketService {
   }
 
 
+
+  // deleteSupermarket
+  deleteSupermarket(id : any): Observable<any> {
+    return this.http.delete(`${environment.apiUrl}/auth/deleteSupermarket/${id}` );
+  }
+
   // Add Supermarket
   addSupermarket(data: any): Observable<any> {
     const formData = new FormData();
@@ -40,7 +46,10 @@ export class SupermarketService {
     return this.http.post(`${environment.apiUrl}/auth/createSupermarket`, formData);
   }
 
-
+  // Update Supermarket
+  updateSupermarket(id : any , data: any): Observable<any> {
+    return this.http.patch(`${environment.apiUrl}/auth/updateSupermarket/${id}`, data);
+  }
 
 
   // All Sections
@@ -52,6 +61,14 @@ export class SupermarketService {
   addSection (id : any , data: any): Observable<any> {
 
     return this.http.post(`${environment.apiUrl}/auth/addSection/${id}`, data);
+  }
+
+  updateSection(id : any , data: any): Observable<any> {
+    return this.http.patch(`${environment.apiUrl}/auth/updateSection/${id}`, data);
+  }
+
+  deleteSection(id : any): Observable<any> {
+    return this.http.delete(`${environment.apiUrl}/auth/deleteSection/${id}` );
   }
 
 
@@ -87,7 +104,6 @@ export class SupermarketService {
   addAuthorization(data: any): Observable<any> {
     return this.http.post(`${environment.apiUrl}/auth/addAuthorizedUserToSupermarket`, data);
   }
-
 
 
 }

@@ -108,8 +108,16 @@
             <label class="block text-gray-700 font-medium mb-1">Phone</label>
             <input type="text" formControlName="phone" placeholder="+201012345678"
               class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
-            <div *ngIf="supermarketForm.get('phone')?.touched && supermarketForm.get('phone')?.invalid"
-              class="text-red-500 text-sm mt-1">Phone must start with +20 and be followed by 9 digits</div>
+            <div
+              *ngIf="supermarketForm.get('phone')?.invalid && (supermarketForm.get('phone')?.dirty || supermarketForm.get('phone')?.touched)"
+              class="text-red-600 text-sm mt-1">
+              <div *ngIf="supermarketForm.get('phone')?.errors?.['required']">
+                Phone number is required.
+              </div>
+              <div *ngIf="supermarketForm.get('phone')?.errors?.['pattern']">
+                Phone number must start with +222 or 20 followed by 8 digits.
+              </div>
+            </div>
           </div>
 
           <!-- Status -->
@@ -130,8 +138,16 @@
             <label class="block text-gray-700 font-medium mb-1">Website</label>
             <input type="url" formControlName="supermarketLocationLink" placeholder="https://example.com"
               class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
-            <div *ngIf="supermarketForm.get('supermarketLocationLink')?.touched && supermarketForm.get('supermarketLocationLink')?.invalid"
-              class="text-red-500 text-sm mt-1">Website must start with https://</div>
+            <div
+              *ngIf="supermarketForm.get('supermarketLocationLink')?.invalid && (supermarketForm.get('supermarketLocationLink')?.dirty || supermarketForm.get('supermarketLocationLink')?.touched)"
+              class="text-red-600 text-sm mt-1">
+              <div *ngIf="supermarketForm.get('supermarketLocationLink')?.errors?.['required']">
+                Google Maps link is required.
+              </div>
+              <div *ngIf="supermarketForm.get('supermarketLocationLink')?.errors?.['pattern']">
+                Link must start with https://
+              </div>
+            </div>
           </div>
         </div>
 
@@ -173,7 +189,7 @@
 
         <!-- Submit -->
         <div class="flex justify-end mt-6">
-          <button type="submit" [disabled]="supermarketForm.invalid" *ngIf="!show"
+          <button type="submit" *ngIf="!show"
             class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium px-6 py-2 rounded-lg shadow-md transition-all duration-300">
             {{ mode ? 'Update' : 'Save' }}
           </button>
@@ -208,7 +224,7 @@
           <td class="px-4 py-3">{{ i + 1 }}</td>
           <td class="px-4 py-3 font-semibold">{{ user.name.en }}</td>
           <td class="px-4 py-3">{{ user.phone || 'N/A' }}</td>
-          <td class="px-4 py-3">{{ user.isOpen || 'N/A' }}</td>
+          <td class="px-4 py-3">{{ user.isOpen  }}</td>
           <!-- <td class="px-4 py-3">{{ user.rating || 'N/A' }}</td>
           <td class="px-4 py-3">{{ user.deliveryTime || 'N/A' }}</td>
           <td class="px-4 py-3">{{ user.distance || 'N/A' }}</td>
@@ -224,12 +240,12 @@
               <i class="fas fa-eye"></i>
 
             </button>
-            <button routerLink="/add-section/{{ user._id }}" class="bg-blue-700 text-white rounded-lg p-2 mx-3  transition">
+            <button routerLink="/add-section/{{ user._id }}"
+              class="bg-blue-700 text-white rounded-lg p-2 mx-3  transition">
               <i class="fas fa-plus"></i>
               <span class="mx-1">Add Section</span>
             </button>
-            <button (click)="openAddRoleModal(user._id)"
-              class="bg-blue-700 text-white rounded-lg p-2 mx-3  transition">
+            <button (click)="openAddRoleModal(user._id)" class="bg-blue-700 text-white rounded-lg p-2 mx-3  transition">
               + Add Role
             </button>
           </td>
@@ -289,8 +305,9 @@
 
 
         </div>
-        <div *ngIf="accountType" >
-          <select formControlName="userId" class="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500">
+        <div *ngIf="accountType">
+          <select formControlName="userId"
+            class="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500">
             <option value="" disabled>Select user</option>
             <option *ngFor="let admin of admins" [value]="admin._id">
               {{ admin.fullName }}

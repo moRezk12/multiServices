@@ -130,35 +130,70 @@ export class AddSectionComponent implements OnInit {
       console.log(this.sectionForm.value);
       const Data = this.sectionForm.value;
 
-      this._supermarketService.addSection(this.selectIdSupermarket , Data).subscribe({
-        next: (res) => {
-          Swal.fire({
-            icon: 'success',
-            title: res.message || 'Success',
-            text: 'Restaurant added successfully!',
-            confirmButtonColor: '#28a745',
-            confirmButtonText: 'OK',
-            timer: 2000,
-            timerProgressBar: true,
-          }).then(() => {
-            this.getAllSection(this.selectIdSupermarket);
-            this.closeModal();
-            this.sectionForm.reset();
-          });
-        },
-        error: (err) => {
-          console.error('Error adding restaurant:', err);
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Failed to add restaurant. Please try again.',
-            confirmButtonColor: '#d33',
-            confirmButtonText: 'Close',
-            timer: 2000,
-            timerProgressBar: true,
-          });
-        }
-      });
+      if(this.mode){
+
+        this._supermarketService.updateSection(this.sectionId , Data).subscribe({
+          next: (res) => {
+            Swal.fire({
+              icon: 'success',
+              title: res.message || 'Success',
+              text: 'Restaurant added successfully!',
+              confirmButtonColor: '#28a745',
+              confirmButtonText: 'OK',
+              timer: 2000,
+              timerProgressBar: true,
+            }).then(() => {
+              this.getAllSection(this.selectIdSupermarket);
+              this.closeModal();
+              this.sectionForm.reset();
+            });
+          },
+          error: (err) => {
+            console.error('Error adding restaurant:', err);
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Failed to add restaurant. Please try again.',
+              confirmButtonColor: '#d33',
+              confirmButtonText: 'Close',
+              timer: 2000,
+              timerProgressBar: true,
+            });
+          }
+        });
+      }else {
+
+        this._supermarketService.addSection(this.selectIdSupermarket , Data).subscribe({
+          next: (res) => {
+            Swal.fire({
+              icon: 'success',
+              title: res.message || 'Success',
+              text: 'Restaurant added successfully!',
+              confirmButtonColor: '#28a745',
+              confirmButtonText: 'OK',
+              timer: 2000,
+              timerProgressBar: true,
+            }).then(() => {
+              this.getAllSection(this.selectIdSupermarket);
+              this.closeModal();
+              this.sectionForm.reset();
+            });
+          },
+          error: (err) => {
+            console.error('Error adding restaurant:', err);
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Failed to add restaurant. Please try again.',
+              confirmButtonColor: '#d33',
+              confirmButtonText: 'Close',
+              timer: 2000,
+              timerProgressBar: true,
+            });
+          }
+        });
+      }
+
     } else {
       console.error('Form is invalid');
     }
@@ -166,41 +201,80 @@ export class AddSectionComponent implements OnInit {
   }
 
 
+
+  sectionId!: number;
   // Open the modal to edit a restaurant
-  openEditModal(supermarket: any) {
+  openEditModal(section: any) {
 
-    console.log('supermarket', supermarket);
-
+    console.log('section', section);
+    this.sectionId = section._id;
     this.showModal = true;
     this.mode = true; // Set mode to edit
     this.sectionForm.patchValue({
-      isOpen: supermarket.isOpen,
-      phone: supermarket.phone,
-      supermarketLocationLink: supermarket.supermarketLocationLink,
+      isOpen: section.isOpen,
+      phone: section.phone,
+      sectionLocationLink: section.sectionLocationLink,
     });
 
     this.sectionForm.get('name')?.patchValue({
-      en: supermarket.name.en,
-      ar: supermarket.name.ar,
-      fr: supermarket.name.fr,
+      en: section.name.en,
+      ar: section.name.ar,
+      fr: section.name.fr,
     });
 
     this.sectionForm.get('description')?.patchValue({
-      en: supermarket.description.en,
-      ar: supermarket.description.ar,
-      fr: supermarket.description.fr,
+      en: section.description.en,
+      ar: section.description.ar,
+      fr: section.description.fr,
     });
 
-    this.sectionForm.disable();
-
-    // if (supermarket.image && supermarket.image.secure_url) {
-    //   this.imagePreview = supermarket.image.secure_url ;
-    // }
 
   }
 
   // Delete a restaurant
-  deleteRestaurant(restaurantId: number) {
+  deleteRestaurant(sectionId: number) {
+
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'You will not be able to recover this section!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'No, keep it',
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this._supermarketService.deleteSection(sectionId).subscribe({
+          next: (res) => {
+            this.getAllSection(this.selectIdSupermarket);
+            Swal.fire({
+              icon: 'success',
+              title: res.message || 'Success',
+              text: 'Section deleted successfully!',
+              confirmButtonColor: '#28a745',
+              confirmButtonText: 'OK',
+              timer: 2000,
+              timerProgressBar: true,
+            }).then(() => {
+                this.getAllSection(this.selectIdSupermarket);
+              });
+          },
+          error: (err) => {
+            console.error('Error deleting section:', err);
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Failed to delete section. Please try again.',
+              confirmButtonColor: '#d33',
+              confirmButtonText: 'Close',
+              timer: 2000,
+              timerProgressBar: true,
+            });
+          }
+        });
+      }
+    });
 
   }
 

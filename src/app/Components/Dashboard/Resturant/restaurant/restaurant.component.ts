@@ -16,6 +16,10 @@ export class RestaurantComponent implements OnInit {
   mode : boolean = false;
   restaurants: any[] = []; // Array to hold restaurant data
 
+    // ✅ Preview variables
+  imagePreview: string | null = null;
+  menuImagePreviews: string[] = [];
+
   // Form Group
   restaurantForm! : FormGroup;
   autharizaForm! : FormGroup;
@@ -35,7 +39,7 @@ ngOnInit(): void {
     rating: ['', [Validators.required, Validators.min(1), Validators.max(5)]],
     isOpen: [false, [Validators.required]],
     discripion: ['', [Validators.required]],
-    phone: ['+222', [Validators.required, Validators.pattern(/^\+222[0-9]{9}$/)]], // +222 + 9 أرقام
+    phone: ['+222', [Validators.required, Validators.pattern(/^\+222[0-9]{8}$/)]], // +222 + 9 أرقام
     websiteLink: ['', [Validators.required, Validators.pattern(/^https:\/\/.+$/)]], // يبدأ بـ https
     image: [null, [Validators.required]],
     menuImages: this.fb.array([], Validators.required),
@@ -88,68 +92,75 @@ ngOnInit(): void {
 // Getter للـ menuImages (FormArray)
 
 // -----------------------------
-// ✅ Single Image
-imagePreview: string | null = null;
-
-onImageSelected(event: any) {
-  const file: File = event.target.files[0];
-  if (file) {
-    this.restaurantForm.patchValue({ image: file });
-    const reader = new FileReader();
-    reader.onload = () => (this.imagePreview = reader.result as string);
-    reader.readAsDataURL(file);
+ // ✅ Getters for form arrays
+  get menuImages(): FormArray {
+    return this.restaurantForm.get('menuImages') as FormArray;
   }
-}
 
-onRemoveImage(event: MouseEvent) {
-  event.stopPropagation(); // يمنع فتح نافذة اختيار صور
-  this.restaurantForm.patchValue({ image: null });
-  this.imagePreview = null;
-}
+  get removedMenuImages(): FormArray {
+    return this.restaurantForm.get('removedMenuImages') as FormArray;
+  }
 
-get menuImages(): FormArray {
-  return this.restaurantForm.get('menuImages') as FormArray;
-}
-// -----------------------------
-// ✅ Multiple Images
-menuImagePreviews: string[] = [];
+  // ✅ Phone fix for +222
+  private fixPhonePrefix() {
+    this.restaurantForm.get('phone')?.valueChanges.subscribe(value => {
+      if (value && !value.startsWith('+222')) {
+        const newValue = '+222' + value.replace('+222', '');
+        this.restaurantForm.patchValue({ phone: newValue }, { emitEvent: false });
+      }
+      if (value === '+22' || value === '+2' || value === '+' || value === '') {
+        this.restaurantForm.patchValue({ phone: '+222' }, { emitEvent: false });
+      }
+    });
+  }
 
-onMenuImagesSelected(event: any) {
-  const files: FileList = event.target.files;
-  if (files && files.length > 0) {
-    for (let i = 0; i < files.length; i++) {
-      this.addMenuImage(files[i]);
+  // ✅ Single image
+  onImageSelected(event: any) {
+    const file: File = event.target.files[0];
+    if (file) {
+      this.restaurantForm.patchValue({ image: file });
+      const reader = new FileReader();
+      reader.onload = () => (this.imagePreview = reader.result as string);
+      reader.readAsDataURL(file);
     }
   }
-}
 
-addMenuImage(file: File) {
-  this.menuImages.push(this.fb.control(file));
-  const reader = new FileReader();
-  reader.onload = () => this.menuImagePreviews.push(reader.result as string);
-  reader.readAsDataURL(file);
-}
-
-get removedMenuImages(): FormArray {
-  return this.restaurantForm.get('removedMenuImages') as FormArray;
-}
-removeMenuImage(index: number) {
-  const removedImage = this.menuImages.at(index).value;
-
-  // ✅ لو احنا في وضع Edit و الصورة لها public_id
-  if (this.mode && removedImage && removedImage.public_id) {
-    this.removedMenuImages.push(this.fb.control(removedImage.public_id));
+  onRemoveImage(event: MouseEvent) {
+    event.stopPropagation();
+    this.restaurantForm.patchValue({ image: null });
+    this.imagePreview = null;
   }
 
-  // شيل الصورة من القائمة
-  this.menuImages.removeAt(index);
-  this.menuImagePreviews.splice(index, 1);
-}
+  // ✅ Multiple images
+  onMenuImagesSelected(event: any) {
+    const files: FileList = event.target.files;
+    if (files && files.length > 0) {
+      for (let i = 0; i < files.length; i++) {
+        this.addMenuImage(files[i]);
+      }
+    }
+  }
 
-onRemoveMenuImage(event: MouseEvent, index: number) {
-  event.stopPropagation(); // يمنع فتح نافذة اختيار صور
-  this.removeMenuImage(index);
-}
+  addMenuImage(file: File) {
+    this.menuImages.push(this.fb.control(file));
+    const reader = new FileReader();
+    reader.onload = () => this.menuImagePreviews.push(reader.result as string);
+    reader.readAsDataURL(file);
+  }
+
+  removeMenuImage(index: number) {
+    const removedImage = this.menuImages.at(index).value;
+    if (this.mode && removedImage && removedImage.public_id) {
+      this.removedMenuImages.push(this.fb.control(removedImage.public_id));
+    }
+    this.menuImages.removeAt(index);
+    this.menuImagePreviews.splice(index, 1);
+  }
+
+  onRemoveMenuImage(event: MouseEvent, index: number) {
+    event.stopPropagation();
+    this.removeMenuImage(index);
+  }
 
 
 
@@ -283,12 +294,11 @@ onRemoveMenuImage(event: MouseEvent, index: number) {
 
   // Open the modal to edit a restaurant
   restaurantId!: string;
+  // ✅ Open Edit Modal
   openEditModal(restaurant: any) {
-    console.log('restaurant', restaurant);
     this.restaurantId = restaurant._id;
-
     this.showModal = true;
-    this.mode = true; // edit mode
+    this.mode = true;
 
     this.restaurantForm.patchValue({
       name: restaurant.name,
@@ -299,36 +309,28 @@ onRemoveMenuImage(event: MouseEvent, index: number) {
       websiteLink: restaurant.websiteLink,
     });
 
-    // إعادة تعيين القوائم
+    // Reset images
     this.menuImages.clear();
     this.removedMenuImages.clear();
     this.menuImagePreviews = [];
     this.imagePreview = null;
-// ✅ صورة واحدة
-  const imageValue = typeof restaurant.image === 'string'
-    ? restaurant.image
-    : restaurant.image?.secure_url || null;
 
-  this.restaurantForm.get('image')?.setValue(imageValue);
-  this.imagePreview = imageValue;
+    // Main image
+    const imageValue = typeof restaurant.image === 'string'
+      ? restaurant.image
+      : restaurant.image?.secure_url || null;
+    this.restaurantForm.get('image')?.setValue(imageValue);
+    this.imagePreview = imageValue;
 
-  // ✅ نعيد تعيين الـ menuImages و removedMenuImages
-  this.menuImages.clear();
-  this.removedMenuImages.clear();
-  this.menuImagePreviews = [];
+    // Menu images
+    if (restaurant.menuImages) {
+      restaurant.menuImages.forEach((img: any) => {
+        this.menuImages.push(this.fb.control(img));
+        this.menuImagePreviews.push(img.secure_url);
+      });
+    }
 
-  // ✅ نضيف صور المينيو
-  if (restaurant.menuImages) {
-    restaurant.menuImages.forEach((img: any) => {
-      this.menuImages.push(this.fb.control(img)); // كل صورة control
-      this.menuImagePreviews.push(img.secure_url);
-    });
-  }
-
-  // ✅ نضمن إن removedMenuImages فاضية
-  this.restaurantForm.get('removedMenuImages')?.setValue([]);
-
-
+    this.restaurantForm.get('removedMenuImages')?.setValue([]);
   }
 
 

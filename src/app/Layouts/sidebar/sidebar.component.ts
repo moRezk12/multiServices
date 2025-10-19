@@ -14,6 +14,7 @@ links = [
   { url: '/admin', name: 'Admin', icon: 'fa-user' },
   // { url: '/restaurant', name: 'Restaurant', icon: 'fa-utensils' },
   { url: '/add-supermarket', name: 'Supermarket', icon: 'fa-shopping-cart' },
+  { url: '/privacy-policy', name: 'Privacy Policy', icon: 'fa-user' },
   {
     name: 'Resturant',
     children: [
