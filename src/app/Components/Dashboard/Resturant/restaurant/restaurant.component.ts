@@ -39,24 +39,14 @@ ngOnInit(): void {
     rating: ['', [Validators.required, Validators.min(1), Validators.max(5)]],
     isOpen: [false, [Validators.required]],
     discripion: ['', [Validators.required]],
-    phone: ['+222', [Validators.required, Validators.pattern(/^\+222[0-9]{8}$/)]], // +222 + 9 أرقام
+    phone: ['+222', [Validators.required, Validators.pattern(/^\+222\d{8}$/)]], // +222 + 9 أرقام
     websiteLink: ['', [Validators.required, Validators.pattern(/^https:\/\/.+$/)]], // يبدأ بـ https
-    image: [null, [Validators.required]],
+    image: [null],
     menuImages: this.fb.array([], Validators.required),
     removedMenuImages: this.fb.array([]),
   });
 
-  // خلي +222 ثابتة في الحقل
-  this.restaurantForm.get('phone')?.valueChanges.subscribe(value => {
-    if (value && !value.startsWith('+222')) {
-      const newValue = '+222' + value.replace('+222', '');
-      this.restaurantForm.patchValue({ phone: newValue }, { emitEvent: false });
-    }
-    // منع حذف البادئة
-    if (value === '+22' || value === '+2' || value === '+' || value === '') {
-      this.restaurantForm.patchValue({ phone: '+222' }, { emitEvent: false });
-    }
-  });
+    this.fixPhonePrefix();
 
   this.autharizaForm = this.fb.group({
     role: ['manager', [Validators.required]],
@@ -67,6 +57,34 @@ ngOnInit(): void {
   // Initialize or fetch data if needed
   this.getAllRestaurants();
 }
+
+private fixPhonePrefix(): void {
+  const phoneControl = this.restaurantForm.get('phone');
+
+  phoneControl?.valueChanges.subscribe(value => {
+    if (value == null) return;
+
+    // 🧹 إزالة أي رموز غير أرقام بعد +222
+    if (!value.startsWith('+222')) {
+      const digitsOnly = value.replace(/\D/g, ''); // يحتفظ بالأرقام فقط
+      phoneControl.patchValue(`+222${digitsOnly}`, { emitEvent: false });
+    }
+
+    // 🧩 لو المستخدم حاول يمسح +222 نحافظ عليها
+    if (value.length < 4 || !value.startsWith('+222')) {
+      phoneControl.patchValue('+222', { emitEvent: false });
+    }
+
+    // 🧠 لا تسمح إلا بالأرقام بعد +222
+    if (value.startsWith('+222')) {
+      const prefix = '+222';
+      const digits = value.slice(prefix.length).replace(/\D/g, ''); // خُذ الأرقام فقط بعد +222
+      phoneControl.patchValue(prefix + digits, { emitEvent: false });
+    }
+  });
+}
+
+
 
 
   isPhoneNumber(value: string): boolean {
@@ -101,18 +119,6 @@ ngOnInit(): void {
     return this.restaurantForm.get('removedMenuImages') as FormArray;
   }
 
-  // ✅ Phone fix for +222
-  private fixPhonePrefix() {
-    this.restaurantForm.get('phone')?.valueChanges.subscribe(value => {
-      if (value && !value.startsWith('+222')) {
-        const newValue = '+222' + value.replace('+222', '');
-        this.restaurantForm.patchValue({ phone: newValue }, { emitEvent: false });
-      }
-      if (value === '+22' || value === '+2' || value === '+' || value === '') {
-        this.restaurantForm.patchValue({ phone: '+222' }, { emitEvent: false });
-      }
-    });
-  }
 
   // ✅ Single image
   onImageSelected(event: any) {
@@ -136,6 +142,18 @@ ngOnInit(): void {
     const files: FileList = event.target.files;
     if (files && files.length > 0) {
       for (let i = 0; i < files.length; i++) {
+
+        if (this.menuImages.length >= 3) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'You can only select up to 3 images.',
+          confirmButtonColor: '#d33',
+          confirmButtonText: 'Close',
+        });
+        break;
+      }
+
         this.addMenuImage(files[i]);
       }
     }
@@ -150,12 +168,16 @@ ngOnInit(): void {
 
   removeMenuImage(index: number) {
     const removedImage = this.menuImages.at(index).value;
+
+    // في حالة التعديل فقط
     if (this.mode && removedImage && removedImage.public_id) {
       this.removedMenuImages.push(this.fb.control(removedImage.public_id));
     }
+
     this.menuImages.removeAt(index);
     this.menuImagePreviews.splice(index, 1);
   }
+
 
   onRemoveMenuImage(event: MouseEvent, index: number) {
     event.stopPropagation();
@@ -187,6 +209,12 @@ ngOnInit(): void {
   // Open the modal to add a new restaurant
   openAddModal() {
     this.showModal = true;
+      this.restaurantForm.get('image')?.setValidators([Validators.required]);
+  this.restaurantForm.get('menuImages')?.setValidators([Validators.required]);
+    this.mode = false;
+    this.show = false;
+    this.viewData = false;
+      this.restaurantForm.updateValueAndValidity();
   }
 
   closeModal() {
@@ -203,55 +231,41 @@ ngOnInit(): void {
 
   // Submit the form
   onSubmit() {
-
-    console.log(this.restaurantForm.value);
-
     if (this.restaurantForm.valid) {
-      console.log(this.restaurantForm.value);
+      const formValue = this.restaurantForm.value;
+      console.log('🟡 Form Value Before Submit:', formValue);
 
-      const formData = this.restaurantForm.value;
+      const formData = this.prepareFormData(formValue);
 
       if (this.mode) {
-        // Update Restaurant
-
-        this.resturantServices.updateRestaurant(  this.restaurantId ,formData).subscribe({
+        // 🟦 EDIT MODE
+        this.resturantServices.updateRestaurant(this.restaurantId, formData).subscribe({
           next: (res) => {
             Swal.fire({
               icon: 'success',
               title: res.message || 'Success',
               text: 'Restaurant updated successfully!',
               confirmButtonColor: '#28a745',
-              confirmButtonText: 'OK',
               timer: 2000,
-              timerProgressBar: true,
             }).then(() => {
               this.getAllRestaurants();
               this.closeModal();
-              this.restaurantForm.reset();
-              this.menuImages.clear();
-              this.imagePreview = null;
-              this.menuImagePreviews = [];
+              this.resetForm();
             });
           },
           error: (err) => {
-            console.error('Error updating restaurant:', err);
+            console.error('❌ Error updating restaurant:', err);
             Swal.fire({
               icon: 'error',
               title: 'Error',
-              text: 'Failed to update restaurant. Please try again.',
+              text: err.error?.message || 'Failed to update restaurant. Please try again.',
               confirmButtonColor: '#d33',
-              confirmButtonText: 'Close',
-              timer: 2000,
-              timerProgressBar: true,
+              timer: 2500,
             });
           }
         });
-
-      }else {
-        // Add Restaurant
-
-        this.restaurantForm.get('removedMenuImages')?.setValue([]);
-
+      } else {
+        // 🟩 ADD MODE
         this.resturantServices.addRestaurant(formData).subscribe({
           next: (res) => {
             Swal.fire({
@@ -259,46 +273,90 @@ ngOnInit(): void {
               title: res.message || 'Success',
               text: 'Restaurant added successfully!',
               confirmButtonColor: '#28a745',
-              confirmButtonText: 'OK',
               timer: 2000,
-              timerProgressBar: true,
             }).then(() => {
               this.getAllRestaurants();
               this.closeModal();
-              this.restaurantForm.reset();
-              this.menuImages.clear();
-              this.imagePreview = null;
-              this.menuImagePreviews = [];
+              this.resetForm();
             });
           },
           error: (err) => {
-            console.error('Error adding restaurant:', err);
+            console.error('❌ Error adding restaurant:', err);
             Swal.fire({
               icon: 'error',
               title: 'Error',
-              text: 'Failed to add restaurant. Please try again.',
+              text: err.error?.message || 'Failed to add restaurant. Please try again.',
               confirmButtonColor: '#d33',
-              confirmButtonText: 'Close',
-              timer: 2000,
-              timerProgressBar: true,
+              timer: 2500,
             });
           }
         });
       }
     } else {
       console.error('Form is invalid');
+      this.restaurantForm.markAllAsTouched();
+    }
+  }
+
+  // ✅ تجهيز البيانات للإرسال
+  prepareFormData(formValue: any): FormData {
+    const formData = new FormData();
+
+    // نصوص وحقول بسيطة
+    formData.append('name', formValue.name);
+    formData.append('rating', formValue.rating);
+    formData.append('isOpen', formValue.isOpen);
+    formData.append('discripion', formValue.discripion);
+    formData.append('phone', formValue.phone);
+    formData.append('websiteLink', formValue.websiteLink);
+
+    // الصورة الأساسية
+    if (formValue.image instanceof File) {
+      formData.append('image', formValue.image);
+    } else if (typeof formValue.image === 'string') {
+      formData.append('oldImage', formValue.image);
     }
 
+    // صور المينيو
+    if (formValue.menuImages && formValue.menuImages.length > 0) {
+      formValue.menuImages.forEach((img: any) => {
+        if (img instanceof File) {
+          formData.append('menuImages', img);
+        } else if (img.secure_url || img.url) {
+          formData.append('oldMenuImages', JSON.stringify(img));
+        }
+      });
+    }
+
+    // الصور المحذوفة
+    if (formValue.removedMenuImages && formValue.removedMenuImages.length > 0) {
+      // ✅ نحولها إلى array string بالضبط زي ما الباك إند عايز
+      formData.append('removedMenuImages', JSON.stringify(formValue.removedMenuImages));
+    }
+
+    return formData;
+  }
+
+  resetForm() {
+    this.restaurantForm.reset();
+    this.menuImages.clear();
+    this.removedMenuImages.clear();
+    this.imagePreview = null;
+    this.menuImagePreviews = [];
   }
 
 
-  // Open the modal to edit a restaurant
   restaurantId!: string;
   // ✅ Open Edit Modal
   openEditModal(restaurant: any) {
     this.restaurantId = restaurant._id;
     this.showModal = true;
     this.mode = true;
+
+    // حذف الـ Validators لأن الصور موجودة
+    this.restaurantForm.get('image')?.clearValidators();
+    this.restaurantForm.get('menuImages')?.clearValidators();
+    this.restaurantForm.updateValueAndValidity();
 
     this.restaurantForm.patchValue({
       name: restaurant.name,
@@ -309,29 +367,30 @@ ngOnInit(): void {
       websiteLink: restaurant.websiteLink,
     });
 
-    // Reset images
+    // تنظيف الحقول
     this.menuImages.clear();
-    this.removedMenuImages.clear();
+    this.removedMenuImages.setValue([]);
     this.menuImagePreviews = [];
     this.imagePreview = null;
 
-    // Main image
     const imageValue = typeof restaurant.image === 'string'
       ? restaurant.image
       : restaurant.image?.secure_url || null;
+
     this.restaurantForm.get('image')?.setValue(imageValue);
     this.imagePreview = imageValue;
 
-    // Menu images
+    // تحميل الصور القديمة للمينيو
     if (restaurant.menuImages) {
       restaurant.menuImages.forEach((img: any) => {
-        this.menuImages.push(this.fb.control(img));
-        this.menuImagePreviews.push(img.secure_url);
+        if (img && (img.secure_url || img.url)) {
+          this.menuImages.push(this.fb.control(img));
+          this.menuImagePreviews.push(img.secure_url || img.url);
+        }
       });
     }
-
-    this.restaurantForm.get('removedMenuImages')?.setValue([]);
   }
+
 
 
 

@@ -45,21 +45,10 @@ export class AddSupermarketComponent implements OnInit {
         fr : ['', [Validators.required]],
       }),
       isOpen: [false, [Validators.required]],
-      phone: ['', [Validators.required, Validators.pattern(/^\+20[0-9]{8}$/)]],
+    phone: ['+222', [Validators.required, Validators.pattern(/^\+222\d{8}$/)]],
       image: [null, [Validators.required]],
     });
 
-      // خلي +222 ثابتة في الحقل
-  this.supermarketForm.get('phone')?.valueChanges.subscribe(value => {
-    if (value && !value.startsWith('+222')) {
-      const newValue = '+222' + value.replace('+222', '');
-      this.supermarketForm.patchValue({ phone: newValue }, { emitEvent: false });
-    }
-    // منع حذف البادئة
-    if (value === '+22' || value === '+2' || value === '+' || value === '') {
-      this.supermarketForm.patchValue({ phone: '+222' }, { emitEvent: false });
-    }
-  });
 
     this.autharizaForm = this.fb.group({
       role: ['staff' , [Validators.required]],
@@ -70,6 +59,32 @@ export class AddSupermarketComponent implements OnInit {
     // Initialize or fetch data if needed
     this.getAllSupermarket();
   }
+
+  private fixPhonePrefix(): void {
+  const phoneControl = this.supermarketForm.get('phone');
+
+  phoneControl?.valueChanges.subscribe(value => {
+    if (value == null) return;
+
+    // 🧹 إزالة أي رموز غير أرقام بعد +222
+    if (!value.startsWith('+222')) {
+      const digitsOnly = value.replace(/\D/g, ''); // يحتفظ بالأرقام فقط
+      phoneControl.patchValue(`+222${digitsOnly}`, { emitEvent: false });
+    }
+
+    // 🧩 لو المستخدم حاول يمسح +222 نحافظ عليها
+    if (value.length < 4 || !value.startsWith('+222')) {
+      phoneControl.patchValue('+222', { emitEvent: false });
+    }
+
+    // 🧠 لا تسمح إلا بالأرقام بعد +222
+    if (value.startsWith('+222')) {
+      const prefix = '+222';
+      const digits = value.slice(prefix.length).replace(/\D/g, ''); // خُذ الأرقام فقط بعد +222
+      phoneControl.patchValue(prefix + digits, { emitEvent: false });
+    }
+  });
+}
 
     admins : any[] = [];
   getAlladmins(  accountType : string) {
@@ -86,33 +101,28 @@ export class AddSupermarketComponent implements OnInit {
   }
 
 
-  // images
-// Getter للـ menuImages (FormArray)
-get menuImages(): FormArray {
-  return this.supermarketForm.get('menuImages') as FormArray;
-}
-
-// -----------------------------
-// ✅ Single Image
+// ✅ متغير للصورة الواحدة
 imagePreview: string | null = null;
 
+// -----------------------------
+// ✅ اختيار صورة واحدة
 onImageSelected(event: any) {
-  const file: File = event.target.files[0];
+  const file = event.target.files[0];
   if (file) {
     this.supermarketForm.patchValue({ image: file });
+    this.supermarketForm.get('image')?.markAsTouched();
     const reader = new FileReader();
     reader.onload = () => (this.imagePreview = reader.result as string);
     reader.readAsDataURL(file);
   }
 }
-
-onRemoveImage(event: MouseEvent) {
-  event.stopPropagation(); // يمنع فتح نافذة اختيار صور
-  this.supermarketForm.patchValue({ image: null });
-  this.imagePreview = null;
-}
-
 // -----------------------------
+// ✅ حذف الصورة (ترجيعها للحالة الأصلية)
+onRemoveImage() {
+  this.imagePreview = null;
+  this.supermarketForm.patchValue({ image: null });
+  this.supermarketForm.get('image')?.markAsTouched();
+}
 
 
 
@@ -154,151 +164,139 @@ onRemoveImage(event: MouseEvent) {
   }
 
   // Submit the form
-  onSubmit() {
+onSubmit() {
+  console.log(this.supermarketForm.value);
 
-    console.log("===================");
-
-    console.log(this.supermarketForm.value);
-
-    if (this.supermarketForm.valid) {
-
-    console.log(this.supermarketForm.value);
-
-
-      const formData = this.supermarketForm.value;
-
-      if(this.mode){
-
-        this._supermarketService.updateSupermarket(this.supermarketId , formData).subscribe({
-          next: (res) => {
-            Swal.fire({
-              icon: 'success',
-              title: res.message || 'Success',
-              text: 'Supermarket updated successfully!',
-              confirmButtonColor: '#28a745',
-              confirmButtonText: 'OK',
-              timer: 2000,
-              timerProgressBar: true,
-              customClass: {
-                popup: 'custom-popup',
-                confirmButton: 'custom-confirm',
-                title: 'custom-title',
-                htmlContainer: 'custom-text',
-              }
-            }).then(() => {
-              this.closeModal();
-              this.getAllSupermarket();
-              this.supermarketForm.reset();
-              this.imagePreview = null;
-            });
-          },
-          error: (err) => {
-            console.error('Error adding restaurant:', err);
-            Swal.fire({
-              icon: 'error',
-              title: 'Error',
-              text: 'Failed to add supermarket. Please try again.',
-              confirmButtonColor: '#d33',
-              confirmButtonText: 'Close',
-              customClass: {
-                popup: 'custom-popup',
-                confirmButton: 'custom-confirm',
-                title: 'custom-title',
-                htmlContainer: 'custom-text',
-              }
-            });
-          }
-        });
-      }else {
-
-        this._supermarketService.addSupermarket(formData).subscribe({
-          next: (res) => {
-            Swal.fire({
-              icon: 'success',
-              title: res.message || 'Success',
-              text: 'Restaurant added successfully!',
-              confirmButtonColor: '#28a745',
-              confirmButtonText: 'OK',
-              timer: 2000,
-              timerProgressBar: true,
-              customClass: {
-                popup: 'custom-popup',
-                confirmButton: 'custom-confirm',
-                title: 'custom-title',
-                htmlContainer: 'custom-text',
-              }
-            }).then(() => {
-              this.getAllSupermarket();
-              this.closeModal();
-              this.supermarketForm.reset();
-              // this.menuImages.clear();
-              this.imagePreview = null;
-            });
-          },
-          error: (err) => {
-            console.error('Error adding restaurant:', err);
-            Swal.fire({
-              icon: 'error',
-              title: 'Error',
-              text: 'Failed to add restaurant. Please try again.',
-              confirmButtonColor: '#d33',
-              confirmButtonText: 'Close',
-              timer: 2000,
-              timerProgressBar: true,
-            });
-          }
-        });
-      }
-
-    } else {
-      console.error('Form is invalid');
-    }
-
+    if (this.supermarketForm.invalid) {
+    this.supermarketForm.markAllAsTouched();
+    console.log("Form is invalid");
+    return;
   }
+
+  if (this.supermarketForm.valid) {
+    const formValue = this.supermarketForm.value;
+    const formData = this.prepareFormData(formValue);
+
+    if (this.mode) {
+      // ✅ تعديل
+      this._supermarketService.updateSupermarket(this.supermarketId, formData).subscribe({
+        next: (res) => {
+          Swal.fire({
+            icon: 'success',
+            title: res.message || 'Success',
+            text: 'Supermarket updated successfully!',
+            confirmButtonColor: '#28a745',
+            timer: 2000,
+          }).then(() => {
+            this.closeModal();
+            this.getAllSupermarket();
+            this.supermarketForm.reset();
+            this.imagePreview = null;
+          });
+        },
+        error: (err) => {
+          console.error('Error updating supermarket:', err);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to update supermarket. Please try again.',
+          });
+        },
+      });
+    } else {
+      // ✅ إضافة جديدة
+      this._supermarketService.addSupermarket(formData).subscribe({
+        next: (res) => {
+          Swal.fire({
+            icon: 'success',
+            title: res.message || 'Success',
+            text: 'Supermarket added successfully!',
+            confirmButtonColor: '#28a745',
+            timer: 2000,
+          }).then(() => {
+            this.getAllSupermarket();
+            this.closeModal();
+            this.supermarketForm.reset();
+            this.imagePreview = null;
+          });
+        },
+        error: (err) => {
+          console.error('Error adding supermarket:', err);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to add supermarket. Please try again.',
+          });
+        },
+      });
+    }
+  } else {
+    console.error('Form is invalid');
+    this.supermarketForm.markAllAsTouched();
+  }
+}
+
+prepareFormData(formValue: any): FormData {
+  const formData = new FormData();
+
+  // نصوص بسيطة
+  formData.append('supermarketLocationLink', formValue.supermarketLocationLink);
+  formData.append('isOpen', formValue.isOpen);
+  formData.append('phone', formValue.phone);
+
+  // الحقول المترجمة (JSON)
+  formData.append('name', JSON.stringify(formValue.name));
+  formData.append('description', JSON.stringify(formValue.description));
+
+  // الصورة
+  if (formValue.image instanceof File) {
+    formData.append('image', formValue.image);
+  } else if (typeof formValue.image === 'string') {
+    formData.append('oldImage', formValue.image);
+  }
+
+  return formData;
+}
 
 
   supermarketId! : number
 
   // Open the modal to edit a restaurant
-  openEditModal(supermarket: any) {
+// ✅ فتح المودال للتعديل
+openEditModal(supermarket: any) {
+  console.log('supermarket', supermarket);
 
-    console.log('supermarket', supermarket);
+  this.supermarketId = supermarket._id;
+  this.showModal = true;
+  this.show = false;
+  this.mode = true;
 
-    this.supermarketId = supermarket._id
+  this.supermarketForm.patchValue({
+    isOpen: supermarket.isOpen,
+    phone: supermarket.phone,
+    supermarketLocationLink: supermarket.supermarketLocationLink,
+  });
 
-    this.showModal = true;
-    this.show = false;
-    this.mode = true;
-    this.supermarketForm.patchValue({
-      isOpen: supermarket.isOpen,
-      phone: supermarket.phone,
-      supermarketLocationLink: supermarket.supermarketLocationLink,
-    });
+  this.supermarketForm.get('name')?.patchValue({
+    en: supermarket.name.en,
+    ar: supermarket.name.ar,
+    fr: supermarket.name.fr,
+  });
 
-    this.supermarketForm.get('name')?.patchValue({
-      en: supermarket.name.en,
-      ar: supermarket.name.ar,
-      fr: supermarket.name.fr,
-    });
+  this.supermarketForm.get('description')?.patchValue({
+    en: supermarket.description.en,
+    ar: supermarket.description.ar,
+    fr: supermarket.description.fr,
+  });
 
-    this.supermarketForm.get('description')?.patchValue({
-      en: supermarket.description.en,
-      ar: supermarket.description.ar,
-      fr: supermarket.description.fr,
-    });
-
-
-    const imageValue = typeof supermarket.image === 'string'
+  const imageValue =
+    typeof supermarket.image === 'string'
       ? supermarket.image
       : supermarket.image?.secure_url || null;
 
-      this.supermarketForm.get('image')?.setValue(imageValue);
-
-      this.imagePreview = imageValue ;
-
-
-  }
-
+  this.supermarketForm.get('image')?.setValue(imageValue);
+  this.imagePreview = imageValue;
+}
   // Delete a restaurant
   deleteRestaurant(restaurantId: number) {
     Swal.fire({

@@ -1,0 +1,105 @@
+<section class="mt-[40px]">
+  <!-- Add Admin Button -->
+  <div class="mb-6 text-right ">
+    <button (click)="openModal()" class="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 transition">
+      + Add Subscription
+    </button>
+  </div>
+
+  <!-- Modal -->
+  <div *ngIf="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+    <div
+      class="bg-white p-8 rounded-2xl shadow-2xl w-[80%] max-h-[90vh] overflow-y-auto scrrolHide mx-auto relative transition-transform duration-300 scale-100">
+
+      <!-- Header -->
+      <div class="flex items-center mb-6" [ngClass]="{ 'justify-between': !show, 'justify-end': show }">
+        <h2 class="text-2xl font-bold text-gray-800" *ngIf="!show">
+          {{ mode ? 'Edit Subscription' : 'Add Subscription' }}
+        </h2>
+        <div
+          class="bg-red-500 hover:bg-red-600 text-white w-8 h-8 flex items-center justify-center rounded-full shadow-md cursor-pointer transition-all duration-300"
+          (click)="closeModal()">
+          ✕
+        </div>
+      </div>
+
+      <!-- Form -->
+      <form [formGroup]="subscriptionForm" (ngSubmit)="onSubmit()" class="space-y-6">
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Price -->
+          <div>
+            <label class="block text-gray-700 font-medium mb-1">Price</label>
+            <input type="number" formControlName="price"
+              class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+            <div *ngIf="subscriptionForm.get('price')?.touched && subscriptionForm.get('price')?.invalid"
+              class="text-red-500 text-sm mt-1">Price is required</div>
+          </div>
+
+          <!-- durationDays -->
+          <div>
+            <label class="block text-gray-700 font-medium mb-1">Duration Days</label>
+            <input type="number" formControlName="durationDays" 
+              class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+            <div *ngIf="subscriptionForm.get('durationDays')?.touched && subscriptionForm.get('durationDays')?.invalid"
+              class="text-red-500 text-sm mt-1">Duration Days is required  </div>
+          </div>
+
+        </div>
+
+        <!-- Submit -->
+        <div class="flex justify-end mt-6">
+          <button type="submit" *ngIf="!show"
+            class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium px-6 py-2 rounded-lg shadow-md transition-all duration-300">
+            {{ mode ? 'Update' : 'Save' }}
+          </button>
+        </div>
+
+      </form>
+
+
+    </div>
+  </div>
+
+
+
+  <div class="overflow-x-auto bg-white rounded-xl shadow-lg border border-gray-200">
+    <table class="w-full text-center text-gray-700">
+      <thead>
+        <tr class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm md:text-base">
+          <th class="px-4 py-3">#</th>
+          <th class="px-4 py-3">Price</th>
+          <th class="px-4 py-3">Duration Days</th>
+          <th class="px-4 py-3">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let subscrip of subscriptions; let i = index"
+          class="hover:bg-gray-100 transition text-sm md:text-base border-b last:border-none">
+          <td class="px-4 py-3">{{ i + 1 }}</td>
+          <td class="px-4 py-3 font-semibold">{{ subscrip.price || 'N/A' }}</td>
+          <td class="px-4 py-3">{{ subscrip.durationDays || 'N/A' }}</td>
+          <td class="px-4 py-3">
+            <button (click)="EditSubscription(subscrip)" class="text-blue-600 hover:text-blue-800 transition">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button (click)="deleteSubscription(subscrip._id)" class="text-red-600 hover:text-red-800 mx-3 transition">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+            <button (click)="ViewSubscription(subscrip)" class="text-green-600 hover:text-green-800  transition">
+              <i class="fas fa-eye"></i>
+            </button>
+
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+
+
+
+
+</section>
+
+

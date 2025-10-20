@@ -15,6 +15,7 @@ import { RestaurantComponent } from './Components/Dashboard/Resturant/restaurant
 import { AddProductComponent } from './Components/Dashboard/Resturant/add-product/add-product.component';
 import { ProductSectionComponent } from './Components/Dashboard/Supermarket/product-section/product-section.component';
 import { PrivacyPolicyComponent } from './Components/Dashboard/privacy-policy/privacy-policy.component';
+import { SubscriptionComponent } from './Components/Dashboard/subscription/subscription.component';
 
 const routes: Routes = [
 
@@ -28,16 +29,22 @@ const routes: Routes = [
       {path : '' , redirectTo : 'admin', pathMatch : 'full'},
       {path : 'admin' , component: AdminComponent , canActivate : [authGuard]},
 
+      // Users
       {path : 'provider' , component : ProvidersComponent , canActivate : [authGuard]},
       {path : 'customer' , component : CustomerComponent , canActivate : [authGuard] },
 
+      // Resturant
       {path : 'restaurant' , component : RestaurantComponent , canActivate : [authGuard] },
+      {path : 'add-product/:id' , component : AddProductComponent , canActivate : [authGuard] },
+
       // Supermarket
       {path : 'add-supermarket' , component : AddSupermarketComponent , canActivate : [authGuard] },
       {path : 'add-section/:id' , component : AddSectionComponent , canActivate : [authGuard] },
-      {path : 'add-product/:id' , component : AddProductComponent , canActivate : [authGuard] },
       {path : 'add-productSection/:id' , component : ProductSectionComponent , canActivate : [authGuard] },
+
+
       {path : 'privacy-policy' , component : PrivacyPolicyComponent , canActivate : [authGuard] },
+      {path : 'subscription' , component : SubscriptionComponent , canActivate : [authGuard] },
 
 
     ],

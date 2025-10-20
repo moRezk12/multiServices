@@ -117,7 +117,7 @@ export class AddSectionComponent implements OnInit {
     this.showModal = false;
     this.sectionForm.reset();
     this.mode = false;
-    this.viewData = false;
+    // this.viewData = false;
 
   }
 
@@ -279,6 +279,7 @@ export class AddSectionComponent implements OnInit {
   }
 
   //
+  modeProduct = false;
   viewData : boolean = false;
   selectedSection: any;
   openViewModal(supermarket: any) {
@@ -314,133 +315,282 @@ export class AddSectionComponent implements OnInit {
   openAddProductModal() {
     this.showModelAddProduct = true;
     this.viewData = false;
+    this.modeProduct = false;
+
 
   }
 
   closeAddProductModal() {
     this.showModelAddProduct = false;
+    this.modeProduct = false;
+    this.productForm.reset();
+    this.imagePreviews = [];
   }
 
 
 
     // images
-  // getter للـ FormArray
-  get images(): FormArray {
-    return this.productForm.get('images') as FormArray;
-  }
+    imagePreviews: string[] = [];
+// ✅ getters
+get images(): FormArray {
+  return this.productForm.get('images') as FormArray;
+}
 
-  // preview لكل صورة
-  imagePreviews: string[] = [];
+// ✅ اختيار صور جديدة
+// ✅ اختيار صور جديدة
+onImagesSelected(event: any) {
+  const files: FileList = event.target.files;
 
-  // لما تختار صور جديدة
-  onImagesSelected(event: any) {
-    const files: FileList = event.target.files;
-    if (files && files.length > 0) {
-      Array.from(files).forEach((file: File) => {
-        // ضيف الصورة للـ FormArray
-        this.images.push(new FormControl(file));
-
-        // preview
-        const reader = new FileReader();
-        reader.onload = () => {
-          this.imagePreviews.push(reader.result as string);
-        };
-        reader.readAsDataURL(file);
-      });
+  if (files && files.length > 0) {
+    for (let i = 0; i < files.length; i++) {
+      // ✅ تحقق من الحد الأقصى (3 صور فقط)
+      if (this.images.length >= 3) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'You can only select up to 3 images.',
+          confirmButtonColor: '#d33',
+          confirmButtonText: 'Close',
+          // timer: 2000,
+          // timerProgressBar: true,
+        })
+        break; // نوقف التكرار
+      }
+      this.addImage(files[i]);
     }
   }
 
-  // حذف صورة معينة
-  onRemoveImage(index: number, event: MouseEvent) {
-    event.stopPropagation(); // يمنع فتح نافذة اختيار صور
-    this.images.removeAt(index);
-    this.imagePreviews.splice(index, 1);
-  }
+  // ✅ إعادة تعيين input بعد الرفع علشان يقدر يختار نفس الصورة تاني لو حب
+  event.target.value = '';
+}
+
+// ✅ إضافة صورة جديدة للـ FormArray والعرض
+addImage(file: File) {
+  this.images.push(this.fb.control(file));
+  const reader = new FileReader();
+  reader.onload = () => this.imagePreviews.push(reader.result as string);
+  reader.readAsDataURL(file);
+}
+
+
+
+// ✅ حذف صورة
+removeImage(index: number) {
+  this.images.removeAt(index);
+  this.imagePreviews.splice(index, 1);
+}
+onRemoveImage(event: MouseEvent, index: number) {
+  event.stopPropagation();
+  this.removeImage(index);
+}
+
 
   // Submit the form to add a product
   onSubmitAddProduct() {
+
+    console.log(this.selectIdSupermarket);
+
+
     console.log(this.productForm.value);
+
     if (this.productForm.valid) {
-      const Data = this.productForm.value;
+      const formValue = this.productForm.value;
+      const formData = this.prepareProductFormData(formValue);
 
-      // تحويل FormArray للصور إلى مصفوفة عادية
-      const imagesArray = this.productForm.get('images')?.value;
+      if (this.modeProduct) {
+        // 🔹 تحديث المنتج
+        this._supermarketService.updateProduct(this.productIdToEdit, formData).subscribe({
+          next: (res) => {
+            Swal.fire({
+              icon: 'success',
+              title: res.message || 'Success',
+              text: 'Product updated successfully!',
+              confirmButtonColor: '#28a745',
+              timer: 2000,
+              timerProgressBar: true,
+            }).then(() => {
+              this.getAllSection(this.selectIdSupermarket);
+              this.closeAddProductModal();
+              this.productForm.reset();
+              this.imagePreviews = [];
+              this.images.clear();
+            });
+          },
+          error: (err) => {
+            console.error('Error updating product:', err);
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Failed to update product. Please try again.',
+              confirmButtonColor: '#d33',
+              timer: 2000,
+              timerProgressBar: true,
+            });
+          }
+        });
 
-
-      this._supermarketService.addProduct(this.selectedSection._id, Data).subscribe({
-        next: (res) => {
-          Swal.fire({
-            icon: 'success',
-            title: res.message || 'Success',
-            text: 'Product added successfully!',
-            confirmButtonColor: '#28a745',
-            confirmButtonText: 'OK',
-            timer: 2000,
-            timerProgressBar: true,
-          }).then(() => {
-            this.getAllSection(this.selectIdSupermarket);
-            this.closeAddProductModal();
-            this.productForm.reset();
-            this.imagePreviews = [];
-            this.images.clear();
-          });
-        },
-        error: (err) => {
-          console.error('Error adding product:', err);
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Failed to add product. Please try again.',
-            confirmButtonColor: '#d33',
-            confirmButtonText: 'Close',
-            timer: 2000,
-            timerProgressBar: true,
-          });
-        }
-      });
+      } else {
+        // 🔹 إضافة منتج جديد
+        this._supermarketService.addProduct(this.selectedSection._id, formData).subscribe({
+          next: (res) => {
+            Swal.fire({
+              icon: 'success',
+              title: res.message || 'Success',
+              text: 'Product added successfully!',
+              confirmButtonColor: '#28a745',
+              timer: 2000,
+              timerProgressBar: true,
+            }).then(() => {
+              this.getAllSection(this.selectIdSupermarket);
+              this.closeAddProductModal();
+              this.productForm.reset();
+              this.imagePreviews = [];
+              this.images.clear();
+            });
+          },
+          error: (err) => {
+            console.error('Error adding product:', err);
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Failed to add product. Please try again.',
+              confirmButtonColor: '#d33',
+              timer: 2000,
+              timerProgressBar: true,
+            });
+          }
+        });
+      }
     } else {
       console.error('Product form is invalid');
+      this.productForm.markAllAsTouched();
     }
   }
 
-  // Open the modal to edit a product
-  openEditProductModal(product : any) {
-    console.log('product', product);
-    this.showModelAddProduct = true;
-    this.viewData = false;
-    // this.selectedProduct = product;
+// 🧩 ========== تجهيز بيانات الإرسال ==========
 
-    // Patch the form with existing product data
-    this.productForm.patchValue({
-      price: product.price,
-      discount: product.discount,
-      stock: product.stock,
+
+
+
+
+  productIdToEdit: number | null = null;
+
+  openEditProductModal(product: any) {
+  this.showModelAddProduct = true;
+  this.modeProduct = true;
+  this.viewData = false;
+  this.productIdToEdit = product._id;
+
+  this.imagePreviews = [];
+  this.images.clear();
+
+  this.productForm.patchValue({
+    name: product.name,
+    description: product.description,
+    price: product.price,
+    discount: product.discount,
+    stock: product.stock,
+  });
+
+  // ✅ تحميل الصور القديمة وتحويلها إلى ملفات File
+  if (product.images && product.images.length > 0) {
+    product.images.forEach(async (img: any) => {
+      const url = img.secure_url || img.url || img;
+      const file = await this.urlToFile(url, 'image.jpg'); // نحول الصورة لملف
+      this.images.push(this.fb.control(file)); // نحطها كـ File في الـ FormArray
+      this.imagePreviews.push(url); // للعرض فقط
     });
+  }
+}
 
-    this.productForm.get('name')?.patchValue({
-      en: product.name.en,
-      ar: product.name.ar,
-      fr: product.name.fr,
-    });
+// ✅ دالة تحويل URL إلى ملف File
+async urlToFile(url: string, filename: string): Promise<File> {
+  const response = await fetch(url);
+  const blob = await response.blob();
+  return new File([blob], filename, { type: blob.type });
+}
 
-    this.productForm.get('description')?.patchValue({
-      en: product.description.en,
-      ar: product.description.ar,
-      fr: product.description.fr,
-    });
+prepareProductFormData(formValue: any): FormData {
+  const formData = new FormData();
 
-    this.imagePreviews = [];
+  // ✅ الحقول النصية
+  formData.append('name', JSON.stringify(formValue.name));
+  formData.append('description', JSON.stringify(formValue.description));
+  formData.append('price', formValue.price ? String(formValue.price) : '0');
+  formData.append('discount', formValue.discount ? String(formValue.discount) : '0');
+  formData.append('stock', formValue.stock ? String(formValue.stock) : '0');
 
-    // لو عندك صور موجودة في المنتج، ممكن تعبيهم في الـ FormArray والـ previews
-    if (product.images && product.images.length) {
-      product.images.forEach((img: any) => {
-        // هنا بنضيف URL الصورة للـ previews
-        this.imagePreviews.push(img.secure_url);
-        // وممكن تضيف null أو placeholder للـ FormArray لأننا ما عندنا الملف الأصلي
-        this.images.push(new FormControl(null));
-      });
+  // ✅ فصل الصور القديمة عن الجديدة
+  const oldImages: any[] = [];
+  const newFiles: File[] = [];
+
+  (formValue.images || []).forEach((img: any) => {
+    if (img instanceof File) {
+      newFiles.push(img);
+    } else if (typeof img === 'string') {
+      oldImages.push(img);
+    } else if (img && (img.secure_url || img.url)) {
+      oldImages.push(img.secure_url || img.url);
     }
+  });
 
+  // ✅ أرسل الصور القديمة كـ JSON
+  formData.append('oldImages', JSON.stringify(oldImages));
+
+  // ✅ أرسل الصور الجديدة بنفس اسم الحقل اللي السيرفر متوقعه: images
+  newFiles.forEach((file: File) => {
+    formData.append('images', file); // 👈 لازم يكون "images"
+  });
+
+  return formData;
+}
+
+
+
+
+  openDeleteProductModal(id: number) {
+
+        Swal.fire({
+          title: 'Are you sure?',
+          text: 'This action will permanently delete the restaurant!',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#d33',
+          cancelButtonColor: '#3085d6',
+          confirmButtonText: 'Yes, delete it!',
+          cancelButtonText: 'Cancel'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this._supermarketService.deleteProduct(id.toString()).subscribe({
+              next: (res) => {
+                Swal.fire({
+                  icon: 'success',
+                  title: res.message || 'Success',
+                  text: 'Restaurant deleted successfully!',
+                  confirmButtonColor: '#28a745',
+                  confirmButtonText: 'OK',
+                  timer: 2000,
+                  timerProgressBar: true,
+                }).then(() => {
+                  this.viewData = false;
+                  this.getAllSection(this.selectIdSupermarket);
+                });
+              },
+              error: (err) => {
+                console.error('Error deleting restaurant:', err);
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Error',
+                  text: 'Failed to delete restaurant. Please try again.',
+                  confirmButtonColor: '#d33',
+                  confirmButtonText: 'Close',
+                  timer: 2000,
+                  timerProgressBar: true,
+                });
+              }
+            });
+          }
+        });
 
   }
 

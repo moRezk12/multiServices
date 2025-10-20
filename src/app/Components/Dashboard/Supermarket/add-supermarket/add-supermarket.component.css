@@ -34,3 +34,8 @@
 .tw-confirm:hover {
   background-color: #15803d !important; /* green-700 */
 }
+
+
+.scrrolHide {
+  scrollbar-width: none;
+}

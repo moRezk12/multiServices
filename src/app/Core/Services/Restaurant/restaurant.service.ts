@@ -21,75 +21,17 @@ export class RestaurantService {
 
   // Add Restaurant
   addRestaurant(data: any): Observable<any> {
-    const formData = new FormData();
 
-    // نمشي على كل المفاتيح في الفورم
-    Object.keys(data).forEach(key => {
-      if (key === 'image' || key === 'menuImages') {
-        // لو الحقل هو صورة أو صور متعددة
-        if (data[key]) {
-          if (Array.isArray(data[key])) {
-            // لو array => نضيف كل صورة لوحدها
-            data[key].forEach((file: File) => formData.append(key, file));
-          } else {
-            // صورة واحدة
-            formData.append(key, data[key]);
-          }
-        }
-      } else {
-        // باقي الحقول العادية (string / number)
-        formData.append(key, data[key]);
-      }
-    });
-
-    // POST request للـ API
-    return this.http.post(`${environment.apiUrl}/auth/createRestaurant`, formData);
+    return this.http.post(`${environment.apiUrl}/auth/createRestaurant`, data);
   }
 
   // Update Restaurant
-updateRestaurant(restaurantId: string, data: any): Observable<any> {
-  const formData = new FormData();
+  updateRestaurant(restaurantId: string, data: any): Observable<any> {
 
-  Object.keys(data).forEach(key => {
-    if (key === 'image') {
-      const image = data[key];
-      if (image instanceof File) {
-        formData.append('image', image);
-      } else if (image && typeof image === 'object' && image.secure_url) {
-        // لو الصورة القديمة (object فيه secure_url)
-        formData.append('image', JSON.stringify(image));
-      }
-    }
+      return this.http.patch(`${environment.apiUrl}/auth/updateRestaurant/${restaurantId}`, data);
+  }
 
-    else if (key === 'menuImages') {
-      const menuImgs = data[key];
-      if (Array.isArray(menuImgs)) {
-        menuImgs.forEach((img: any) => {
-          if (img instanceof File) {
-            formData.append('menuImages', img);
-          } else if (img && typeof img === 'object' && img.secure_url) {
-            // الصورة القديمة
-            formData.append('menuImages', JSON.stringify(img));
-          }
-        });
-      }
-    }
 
-    else if (key === 'removedMenuImages') {
-      if (Array.isArray(data[key])) {
-        data[key].forEach((id: string) => {
-          formData.append('removedMenuImages', id);
-        });
-      }
-    }
-
-    else {
-      formData.append(key, data[key]);
-    }
-  });
-
-  return this.http.patch(`${environment.apiUrl}/auth/updateRestaurant/${restaurantId}`, formData);
-}
 
 
   // Delete Restaurant
@@ -112,26 +54,8 @@ updateRestaurant(restaurantId: string, data: any): Observable<any> {
 
   // Add Product to Restaurant
   addProductToRestaurant(data: any): Observable<any> {
-    const formData = new FormData();
 
-    // نمشي على كل المفاتيح في الفورم
-    Object.keys(data).forEach(key => {
-      if (key === 'images') {
-        // لو الحقل هو صور متعددة
-        if (data[key]) {
-          if (Array.isArray(data[key])) {
-            // لو array => نضيف كل صورة لوحدها
-            data[key].forEach((file: File) => formData.append(key, file));
-          }
-        }
-      } else {
-        // باقي الحقول العادية (string / number)
-        formData.append(key, data[key]);
-      }
-    });
-
-    // POST request للـ API
-    return this.http.post(`${environment.apiUrl}/auth/createProduct`, formData);
+    return this.http.post(`${environment.apiUrl}/auth/createProduct`,data);
   }
 
   // Get Products by Restaurant ID
@@ -146,32 +70,8 @@ updateRestaurant(restaurantId: string, data: any): Observable<any> {
 
   // Update Product by ID
 updateProductById(productId: string, data: any): Observable<any> {
-  const formData = new FormData();
 
-  Object.keys(data).forEach(key => {
-    if (key === 'images') {
-      if (Array.isArray(data.images) && data.images.length > 0) {
-        data.images.forEach((img: any) => {
-          // ✅ لو الصورة object فيها secure_url => معناها صورة قديمة => نضيفها كـ string
-          if (img && typeof img === 'object' && img.secure_url) {
-            formData.append('existingImages', img.secure_url);
-          }
-          // ✅ لو الصورة File جديد => نضيفها كـ ملف
-          else if (img instanceof File) {
-            formData.append('images', img);
-          }
-        });
-      }
-    } else {
-      if (data[key] !== null && data[key] !== undefined)
-        formData.append(key, data[key]);
-    }
-  });
-
-  return this.http.patch(
-    `${environment.apiUrl}/auth/updateProduct/${productId}`,
-    formData
-  );
+  return this.http.patch(`${environment.apiUrl}/auth/updateProduct/${productId}`,data);
 }
 
 

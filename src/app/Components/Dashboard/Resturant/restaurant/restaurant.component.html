@@ -9,7 +9,7 @@
   <!-- Modal -->
   <div *ngIf="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
     <div
-      class="bg-white p-8 rounded-2xl shadow-2xl w-[70%] max-h-[90vh] overflow-y-auto scrrolHide mx-auto relative transition-transform duration-300 scale-100">
+      class="bg-white p-8 rounded-2xl shadow-2xl w-[80%] max-h-[90vh] overflow-y-auto scrrolHide mx-auto relative transition-transform duration-300 scale-100">
 
       <!-- Header -->
       <div class="flex items-center mb-6" [ngClass]="{ 'justify-between': !show, 'justify-end': show }">
@@ -52,19 +52,24 @@
           <!-- Phone -->
           <div>
             <label class="block text-gray-700 font-medium mb-1">Phone</label>
-            <input type="text" formControlName="phone" placeholder="+222010123456"
+            <input type="text" formControlName="phone" placeholder="+22212345678" maxlength="12"
               class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
-           <div
-              *ngIf="restaurantForm.get('phone')?.invalid && (restaurantForm.get('phone')?.dirty || restaurantForm.get('phone')?.touched)"
-              class="text-red-600 text-sm mt-1">
+
+            <div *ngIf="
+      restaurantForm.get('phone')?.invalid &&
+      (restaurantForm.get('phone')?.dirty || restaurantForm.get('phone')?.touched)
+    " class="text-red-600 text-sm mt-1">
               <div *ngIf="restaurantForm.get('phone')?.errors?.['required']">
                 Phone number is required.
               </div>
+
               <div *ngIf="restaurantForm.get('phone')?.errors?.['pattern']">
-                Phone number must start with +222 or 20 followed by 8 digits.
+                Phone number must start with <b>+222</b> and contain exactly <b>8 digits</b> after it.
               </div>
             </div>
           </div>
+
+
 
           <!-- Status -->
           <div>
@@ -167,7 +172,7 @@
 
         <!-- Submit -->
         <div class="flex justify-end mt-6">
-          <button type="submit"  *ngIf="!show"
+          <button type="submit" *ngIf="!show"
             class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium px-6 py-2 rounded-lg shadow-md transition-all duration-300">
             {{ mode ? 'Update' : 'Save' }}
           </button>
@@ -217,7 +222,8 @@
               + Add Role
             </button>
 
-            <button [routerLink]="['/add-product', user._id]" class="bg-blue-700 text-white rounded-lg p-2 mx-3  transition">
+            <button [routerLink]="['/add-product', user._id]"
+              class="bg-blue-700 text-white rounded-lg p-2 mx-3  transition">
               + Add product
             </button>
 
@@ -240,7 +246,7 @@
 <!-- Modal -->
 <div *ngIf="showModalAddRole" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
   <div
-    class="bg-white p-8 rounded-2xl shadow-2xl w-[70%] max-h-[90vh] overflow-y-auto scrrolHide mx-auto relative transition-transform duration-300 scale-100">
+    class="bg-white p-8 rounded-2xl shadow-2xl w-[80%] max-h-[90vh] overflow-y-auto scrrolHide mx-auto relative transition-transform duration-300 scale-100">
 
     <!-- Header -->
     <div class="flex items-center mb-6" [ngClass]="{ 'justify-between': !show, 'justify-end': show }">

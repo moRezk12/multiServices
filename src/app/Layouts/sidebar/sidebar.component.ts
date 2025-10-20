@@ -8,48 +8,34 @@ import { Router } from '@angular/router';
 })
 export class SidebarComponent {
 
- constructor(private _router: Router) { }
+  constructor(private _router: Router) { }
 
-links = [
-  { url: '/admin', name: 'Admin', icon: 'fa-user' },
-  // { url: '/restaurant', name: 'Restaurant', icon: 'fa-utensils' },
-  { url: '/add-supermarket', name: 'Supermarket', icon: 'fa-shopping-cart' },
-  { url: '/privacy-policy', name: 'Privacy Policy', icon: 'fa-user' },
-  {
-    name: 'Resturant',
-    children: [
-      { url: '/restaurant', name: 'Restaurant', icon: 'fa-utensils' },
-      // { url: '/add-product', name: 'Product', icon: 'fa-user-tie' }
-    ]
-  },
-  {
-    name: 'User',
-    children: [
-      { url: '/customer', name: 'Customer', icon: 'fa-user' },
-      { url: '/provider', name: 'Provider', icon: 'fa-user-tie' }
-    ]
-  },
-  // {
-  //   name: 'Supermarket',
-  //   children: [
-  //     { url: '/add-supermarket', name: 'Add-Supermarket', icon: 'fa-user' },
-  //     // { url: '/add-section', name: 'Add-Section', icon: 'fa-user-tie' },
-  //     // { url: '/add-product', name: 'Add-Product', icon: 'fa-user-tie' },
-  //   ]
-  // },
-]
+  links = [
+    { url: '/admin', name: 'Admin', icon: 'fa-user' },
+    { url: '/add-supermarket', name: 'Supermarket', icon: 'fa-shopping-cart' },
+    { url: '/restaurant', name: 'Restaurant', icon: 'fa-utensils' },
+    { url: '/subscription', name: 'Subscription', icon: 'fa-sync-alt' },
+    { url: '/privacy-policy', name: 'Privacy Policy', icon: 'fa-shield-alt' },
+    {
+      name: 'Users',
+      children: [
+        { url: '/customer', name: 'Customer', icon: 'fa-user' },
+        { url: '/provider', name: 'Provider', icon: 'fa-user-tie' }
+      ]
+    },
+  ]
 
-Logout() {
-  localStorage.clear();
-  this._router.navigate(['/login']);
-}
+  Logout() {
+    localStorage.clear();
+    this._router.navigate(['/login']);
+  }
 
-// هنا بنخزن اسم الـ dropdown المفتوح
-openDropdown: string | null = null;
+  // هنا بنخزن اسم الـ dropdown المفتوح
+  openDropdown: string | null = null;
 
-toggleDropdown(name: string) {
-  this.openDropdown = this.openDropdown === name ? null : name;
-}
+  toggleDropdown(name: string) {
+    this.openDropdown = this.openDropdown === name ? null : name;
+  }
 
 
 

@@ -77,6 +77,16 @@ onImagesSelected(event: any) {
   const files: FileList = event.target.files;
   if (files && files.length > 0) {
     for (let i = 0; i < files.length; i++) {
+      if (this.images.length >= 3) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'You can only select up to 3 images.',
+          confirmButtonColor: '#d33',
+          confirmButtonText: 'Close',
+        });
+        break;
+      }
       this.addMenuImage(files[i]);
     }
   }
@@ -136,132 +146,178 @@ onRemoveMenuImage(event: MouseEvent, index: number) {
   }
 
   // Submit the form
-onSubmit() {
-  this.productForm.patchValue({
-    restaurantId: this.resturandId
-  });
-
-  if (this.productForm.invalid) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Invalid Form',
-      text: 'Please fill in all required fields correctly.',
-      confirmButtonColor: '#d33',
-      confirmButtonText: 'Close',
-      timer: 2000,
-      timerProgressBar: true,
+ onSubmit() {
+    // نضيف restaurantId لو مش موجود
+    this.productForm.patchValue({
+      restaurantId: this.resturandId
     });
-    return;
+
+    if (this.productForm.invalid) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Invalid Form',
+        text: 'Please fill in all required fields correctly.',
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'Close',
+        timer: 2000,
+        timerProgressBar: true,
+      });
+      return;
+    }
+
+    // هنا نحضر FormData
+    const formValue = this.productForm.value;
+    const finalFormData = this.prepareFormData(formValue);
+
+    console.log('Final FormData before submit (preview):', formValue);
+
+    if (this.mode) {
+      // Update Mode (بعتنا FormData)
+      this._resturantService.updateProductById(this.productId, finalFormData).subscribe({
+        next: (res) => {
+          Swal.fire({
+            icon: 'success',
+            title: res.message || 'Success',
+            text: 'Product updated successfully!',
+            confirmButtonColor: '#28a745',
+            confirmButtonText: 'OK',
+            timer: 2000,
+            timerProgressBar: true,
+          }).then(() => {
+            this.getAllProducts();
+            this.closeModal();
+            this.resetForm();
+            this.menuImagePreviews = [];
+          });
+        },
+        error: (err) => {
+          console.error('Error updating product:', err);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to update product. Please try again.',
+            confirmButtonColor: '#d33',
+            confirmButtonText: 'Close',
+            timer: 2000,
+            timerProgressBar: true,
+          });
+        }
+      });
+    } else {
+      // Add Mode
+      this._resturantService.addProductToRestaurant(finalFormData).subscribe({
+        next: (res) => {
+          Swal.fire({
+            icon: 'success',
+            title: res.message || 'Success',
+            text: 'Product added successfully!',
+            confirmButtonColor: '#28a745',
+            confirmButtonText: 'OK',
+            timer: 2000,
+            timerProgressBar: true,
+          }).then(() => {
+            this.closeModal();
+            this.getAllProducts();
+            this.resetForm();
+            this.menuImagePreviews = [];
+          });
+        },
+        error: (err) => {
+          console.error('Error adding product:', err);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to add product. Please try again.',
+            confirmButtonColor: '#d33',
+            confirmButtonText: 'Close',
+            timer: 2000,
+            timerProgressBar: true,
+          });
+        }
+      });
+    }
   }
 
-  const formData = this.productForm.value;
 
-  if (!Array.isArray(formData.images)) {
-    formData.images = [];
-  }
+// ====== تجهيز FormData ======
+prepareFormData(formValue: any): FormData {
+  const formData = new FormData();
 
-  console.log('Final FormData before submit:', formData);
+  // ✅ الحقول النصية والبسيطة
+  formData.append('name', formValue.name || '');
+  formData.append('description', formValue.description || '');
+  formData.append('restaurantId', formValue.restaurantId || '');
 
-  if (this.mode) {
-    // 🔁 Update Mode
-    this._resturantService.updateProductById(this.productId, formData).subscribe({
-      next: (res) => {
-        Swal.fire({
-          icon: 'success',
-          title: res.message || 'Success',
-          text: 'Product updated successfully!',
-          confirmButtonColor: '#28a745',
-          confirmButtonText: 'OK',
-          timer: 2000,
-          timerProgressBar: true,
-        }).then(() => {
-          this.getAllProducts();
-          this.closeModal();
-          this.productForm.reset();
-          this.menuImagePreviews = [];
-        });
-      },
-      error: (err) => {
-        console.error('Error updating product:', err);
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'Failed to update product. Please try again.',
-          confirmButtonColor: '#d33',
-          confirmButtonText: 'Close',
-          timer: 2000,
-          timerProgressBar: true,
-        });
+  // ✅ نحول discount و price لأرقام، لو undefined نخليها 0
+  formData.append('discount', formValue.discount ? String(formValue.discount) : '0');
+  formData.append('price', formValue.price ? String(formValue.price) : '0');
+
+  // ✅ صور المنتج
+  if (formValue.images && formValue.images.length > 0) {
+    formValue.images.forEach((img: any) => {
+      if (img instanceof File) {
+        formData.append('images', img);
+      } else if (img.secure_url || img.url) {
+        formData.append('oldImages', JSON.stringify(img));
       }
     });
-  } else {
-    // ➕ Add Mode
-    this._resturantService.addProductToRestaurant(formData).subscribe({
-      next: (res) => {
-        Swal.fire({
-          icon: 'success',
-          title: res.message || 'Success',
-          text: 'Restaurant added successfully!',
-          confirmButtonColor: '#28a745',
-          confirmButtonText: 'OK',
-          timer: 2000,
-          timerProgressBar: true,
-        }).then(() => {
-          this.closeModal();
-          this.getAllProducts();
-          this.productForm.reset();
-          this.menuImagePreviews = [];
-        });
-      },
-      error: (err) => {
-        console.error('Error adding restaurant:', err);
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'Failed to add restaurant. Please try again.',
-          confirmButtonColor: '#d33',
-          confirmButtonText: 'Close',
-          timer: 2000,
-          timerProgressBar: true,
-        });
-      }
-    });
   }
+
+  // ✅ الصور المحذوفة
+  if (formValue.removedImages && formValue.removedImages.length > 0) {
+    formData.append('removedImages', JSON.stringify(formValue.removedImages));
+  }
+
+  return formData;
 }
+
+
+
+  // ====== Reset ======
+  resetForm() {
+    this.productForm.reset();
+    this.images.clear();
+    this.removedImages.clear();
+    this.menuImagePreviews = [];
+    this.mode = false;
+    this.productId = '';
+  }
 
 // ====== Edit Mode ======
 productId!: string;
 
-openEditModal(product: any) {
-  console.log('product', product);
+// ====== Open Edit Modal ======
+  openEditModal(product: any) {
+    console.log('product', product);
 
-  this.productId = product._id;
-  this.showModal = true;
-  this.mode = true; // edit mode
+    this.productId = product._id;
+    this.showModal = true;
+    this.mode = true; // edit mode
 
-  this.productForm.patchValue({
-    name: product.name,
-    description: product.description,
-    discount: product.discount,
-    price: product.price,
-    restaurantId: product.restaurantId,
-  });
-
-  // ✅ تنظيف الصور القديمة
-  this.images.clear();
-  this.menuImagePreviews = [];
-  this.removedImages.clear();
-
-  // ✅ تحقق من وجود صور
-  if (Array.isArray(product.images) && product.images.length > 0) {
-    product.images.forEach((img: any) => {
-      this.images.push(this.fb.control(img));
-      this.menuImagePreviews.push(img.secure_url || img.url || img);
+    this.productForm.patchValue({
+      name: product.name,
+      description: product.description,
+      discount: product.discount,
+      price: product.price,
+      restaurantId: product.restaurantId,
     });
-  } else {
-    this.productForm.patchValue({ images: [] });
+
+    // تنظيف الصور القديمة والحالة
+    this.images.clear();
+    this.menuImagePreviews = [];
+    this.removedImages.clear();
+
+    // لو في صور موجودة من الباك اند
+    if (Array.isArray(product.images) && product.images.length > 0) {
+      product.images.forEach((img: any) => {
+        // نضيف الكائن أو الرابط كقيمة في الفورم (لما يكون img كائن فيه secure_url/public_id)
+        this.images.push(this.fb.control(img));
+        this.menuImagePreviews.push(img.secure_url || img.url || img);
+      });
+    } else {
+      this.productForm.patchValue({ images: [] });
+    }
   }
-}
 
 
   // Delete a restaurant
