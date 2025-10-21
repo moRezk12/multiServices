@@ -1,5 +1,7 @@
 import { UserService } from 'src/app/Core/Services/user/user.service';
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-providers',
@@ -11,6 +13,9 @@ export class ProvidersComponent implements OnInit {
   activeTab: string = 'Doctor'; // الافتراضي
   providers: any[] = [];
 
+  DoctorForm! : FormGroup;
+  DriverForm! : FormGroup;
+
   // showModal
   showModal : boolean = false;
 
@@ -20,13 +25,23 @@ export class ProvidersComponent implements OnInit {
     totalUsers: number = 0;
     visiblePages: number[] = [];
 
-  constructor(private userService : UserService) { }
+  constructor(private userService : UserService , private fb: FormBuilder) { }
   ngOnInit(): void {
     // Initialize or fetch data if needed
     this.getAllProviders(this.activeTab , this.currentPage);
 
             // Pagination
     this.updateVisiblePages();
+
+    this.DoctorForm = this.fb.group({
+      addDays: ['' , [Validators.required]],
+    })
+
+    this.DriverForm = this.fb.group({
+      kiloPrice: [null, [Validators.required, Validators.min(0)]],
+      isAgree: [false, [Validators.requiredTrue]],
+    });
+
 
   }
 
@@ -88,6 +103,117 @@ openViewModal(provider: any) {
   console.log('Provider details:', provider);
 }
 
+  showEditModalDoctor: boolean = false;
+  selectIdDotor : any ;
+  showEditModalDriver: boolean = false;
+  selectIdDriver : any ;
+
+  openEditModalDoctor(doctor:any){
+    this.showEditModalDoctor = true;
+    this.selectIdDotor = doctor._id
+  }
+
+  closeEditModalDoctor(){
+    this.showEditModalDoctor = false;
+  }
+
+  openEditModalDriver(driver :any ){
+    this.showEditModalDriver = true;
+    this.selectIdDriver = driver._id;
+
+    this.DriverForm.patchValue({
+      kiloPrice: driver.kiloPrice,
+      isAgree: driver.isAgree,
+    });
+
+
+  }
+
+  closeEditModalDriver(){
+    this.showEditModalDriver = false;
+  }
+
+  saveChangesDoctor(){
+
+    console.log(this.DoctorForm.value);
+    this.userService.editDotorOrRealEstate(this.selectIdDotor , this.DoctorForm.value).subscribe({
+      next: (res) => {
+        console.log(res);
+        Swal.fire({
+          icon: 'success',
+          title: res.message || 'Success',
+          text: 'Subscription updated successfully!',
+          confirmButtonColor: '#28a745',
+          timer: 2500,
+        }).then(() => {
+          this.getAllProviders(this.activeTab);
+          this.closeEditModalDoctor();
+        })
+      },
+      error: (err) => {
+        console.error('Error fetching providers:', err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Failed to update provider. Please try again.',
+          confirmButtonColor: '#d33',
+          confirmButtonText: 'Close',
+          timer: 2000,
+          timerProgressBar: true,
+        })
+      }
+    })
+
+  }
+
+
+  saveChangesDriver(){
+
+    console.log(this.DriverForm.value);
+    this.userService.editDriverOrDelivery(this.selectIdDriver , this.DriverForm.value).subscribe({
+      next: (res) => {
+        console.log(res);
+        Swal.fire({
+          icon: 'success',
+          title: res.message || 'Success',
+          text: 'Subscription updated successfully!',
+          confirmButtonColor: '#28a745',
+          timer: 2500,
+        }).then(() => {
+          this.getAllProviders(this.activeTab);
+          this.closeEditModalDriver();
+        })
+      },
+      error: (err) => {
+        console.error('Error fetching providers:', err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Failed to update provider. Please try again.',
+          confirmButtonColor: '#d33',
+          confirmButtonText: 'Close',
+          timer: 2000,
+          timerProgressBar: true,
+        })
+      }
+    })
+
+  }
+
+
+
+  showFullImage = false;
+fullImageUrl: string | null = null;
+
+openFullImage(url: string) {
+  this.fullImageUrl = url;
+  this.showFullImage = true;
+}
+
+closeFullImage() {
+  this.showFullImage = false;
+  this.fullImageUrl = null;
+}
 
 
 }

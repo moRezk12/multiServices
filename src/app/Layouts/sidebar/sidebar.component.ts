@@ -15,6 +15,7 @@ export class SidebarComponent {
     { url: '/add-supermarket', name: 'Supermarket', icon: 'fa-shopping-cart' },
     { url: '/restaurant', name: 'Restaurant', icon: 'fa-utensils' },
     { url: '/subscription', name: 'Subscription', icon: 'fa-sync-alt' },
+    { url: '/paidServices', name: 'Paid Services', icon: 'fa-info-circle' },
     { url: '/privacy-policy', name: 'Privacy Policy', icon: 'fa-shield-alt' },
     {
       name: 'Users',

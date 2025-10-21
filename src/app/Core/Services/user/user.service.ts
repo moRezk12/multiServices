@@ -34,4 +34,13 @@ export class UserService {
     }
 
 
+    editDotorOrRealEstate( id : any , data: any): Observable<any> {
+      return this.http.patch(`${environment.apiUrl}/auth/updateSubscription/${id}`, data);
+    }
+
+    editDriverOrDelivery( id : any , data: any): Observable<any> {
+      return this.http.patch(`${environment.apiUrl}/auth/updateUser/${id}`, data);
+    }
+
+
 }

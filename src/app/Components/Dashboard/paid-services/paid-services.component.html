@@ -1,0 +1,154 @@
+<section class="mt-10 px-4">
+
+  <!-- Tabs -->
+  <div class="flex flex-wrap gap-3 mb-6 border-b pb-2">
+    <button (click)="setActive('Doctor')"
+      [ngClass]="activeTab === 'Doctor' ? 'text-blue-600 border-b-2 border-blue-600 font-semibold' : 'text-gray-600'"
+      class="px-4 py-2 transition">
+      <i class="fas fa-user-md mr-2"></i> Doctor
+    </button>
+
+    <button (click)="setActive('Driver')"
+      [ngClass]="activeTab === 'Driver' ? 'text-blue-600 border-b-2 border-blue-600 font-semibold' : 'text-gray-600'"
+      class="px-4 py-2 transition">
+      <i class="fas fa-car mr-2"></i> Driver
+    </button>
+
+
+
+  </div>
+
+  <!-- Tables -->
+  <div class="overflow-x-auto bg-white rounded-xl shadow-lg border border-gray-200">
+
+    <!-- Doctor / Host Table -->
+    <table *ngIf="activeTab === 'Doctor'" class="w-full text-sm md:text-base">
+      <thead class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-center">
+        <tr>
+          <th class="px-4 py-3">#</th>
+          <th class="px-4 py-3">Service Name</th>
+          <th class="px-4 py-3">Phone Number</th>
+          <th class="px-4 py-3">Subscription Price</th>
+          <th class="px-4 py-3">Subscription Duration</th>
+          <th class="px-4 py-3">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let doctor of providersDoctor; let i = index"
+          class="border-b hover:bg-gray-50 text-center transition">
+          <td class="px-4 py-3">{{ i + 1 }}</td>
+          <td class="px-4 py-3">{{ doctor.serviceName || 'N/A' }}</td>
+          <td class="px-4 py-3 font-semibold">{{ doctor.phoneNumber || 'N/A' }}</td>
+          <td class="px-4 py-3 font-semibold">{{ doctor.subscriptionPrice || 'N/A' }}</td>
+          <td class="px-4 py-3 font-semibold">{{ doctor.subscriptionDuration || 'N/A' }}</td>
+          <td class="px-4 py-3">
+            <button (click)="openViewModal(doctor, 'doctor')"
+              class="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+              View
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Driver / Delivery Table -->
+    <table *ngIf="activeTab === 'Driver'" class="w-full text-sm md:text-base">
+      <thead class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-center">
+        <tr>
+          <th class="px-4 py-3">#</th>
+          <th class="px-4 py-3">Service Name</th>
+          <th class="px-4 py-3">Phone Number </th>
+          <th class="px-4 py-3">Ponits Number</th>
+          <th class="px-4 py-3">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let driver of providers; let i = index" class="border-b hover:bg-gray-50 text-center transition">
+          <td class="px-4 py-3">{{ i + 1 }}</td>
+          <td class="px-4 py-3 font-semibold">{{ driver.serviceName || 'N/A' }}</td>
+          <td class="px-4 py-3">{{ driver.phoneNumber || 'N/A' }}</td>
+          <td class="px-4 py-3">
+            {{ driver.PonitsNumber || 'N/A' }}
+          </td>
+          <td class="px-4 py-3">
+            <button (click)="openViewModal(driver, 'driver')"
+              class="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+              View
+            </button>
+
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+
+</section>
+
+
+<!-- Modal -->
+<div *ngIf="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+  <div
+    class="bg-white p-8 rounded-2xl shadow-2xl w-[80%] max-h-[90vh] overflow-y-auto scrollbar-hide mx-auto relative transition-transform duration-300 scale-100">
+
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-2xl font-semibold text-gray-800">
+        {{ selectedType === 'doctor' ? 'Doctor Details' : 'Driver Details' }}
+      </h2>
+      <div
+        class="bg-red-500 hover:bg-red-600 text-white w-8 h-8 flex items-center justify-center rounded-full shadow-md cursor-pointer transition-all duration-300"
+        (click)="closeModal()">
+        ✕
+      </div>
+    </div>
+
+    <!-- محتوى الدكتور -->
+    <div *ngIf="selectedType === 'doctor' && selectedProvider" class="space-y-3 flex justify-between items-center ">
+      <div class="space-y-3" >
+        <p><strong>Name:</strong> {{ selectedProvider?.userId?.fullName }}</p>
+        <p><strong>Phone:</strong> {{ selectedProvider?.phoneNumber }}</p>
+        <p><strong>Service Name:</strong> {{ selectedProvider?.serviceName }}</p>
+        <p><strong>Subscription Duration:</strong> {{ selectedProvider?.subscriptionDuration }}</p>
+        <p><strong>Subscription Price:</strong> {{ selectedProvider?.subscriptionPrice }}</p>
+      </div>
+
+      <div class="mt-3">
+        <p class="font-semibold">Invoice Image:</p>
+        <img (click)="openFullImage(selectedProvider?.invoiceImage?.secure_url)"
+          [src]="selectedProvider?.invoiceImage?.secure_url" alt="Invoice" class="w-64 rounded-lg shadow-md">
+      </div>
+    </div>
+
+    <!-- محتوى السواق -->
+    <div *ngIf="selectedType === 'driver' && selectedProvider" class="space-y-3 flex justify-between items-center ">
+      <div class="space-y-3" >
+        <p><strong>Name:</strong> {{ selectedProvider?.userId?.fullName }}</p>
+        <p><strong>Phone:</strong> {{ selectedProvider?.phoneNumber }}</p>
+        <p><strong>Service Name:</strong> {{ selectedProvider?.serviceName }}</p>
+        <p><strong>Points:</strong> {{ selectedProvider?.PonitsNumber }}</p>
+      </div>
+
+      <div class="mt-3">
+        <p class="font-semibold">Invoice Image:</p>
+        <img (click)="openFullImage(selectedProvider?.invoiceImage?.secure_url)"
+          [src]="selectedProvider?.invoiceImage?.secure_url" alt="Invoice" class="w-64 rounded-lg shadow-md">
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+<div *ngIf="showFullImage" class="fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-[60]"
+  (click)="closeFullImage()">
+
+  <div class="relative">
+    <img [src]="fullImageUrl" alt="Full Image" class="max-w-[90vw] max-h-[90vh] rounded-lg shadow-2xl">
+    <button (click)="closeFullImage()"
+      class="absolute top-[-15px] right-[-15px] bg-red-600 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-red-700">
+      ✕
+    </button>
+  </div>
+</div>

@@ -16,6 +16,7 @@ import { AddProductComponent } from './Components/Dashboard/Resturant/add-produc
 import { ProductSectionComponent } from './Components/Dashboard/Supermarket/product-section/product-section.component';
 import { PrivacyPolicyComponent } from './Components/Dashboard/privacy-policy/privacy-policy.component';
 import { SubscriptionComponent } from './Components/Dashboard/subscription/subscription.component';
+import { PaidServicesComponent } from './Components/Dashboard/paid-services/paid-services.component';
 
 const routes: Routes = [
 
@@ -45,6 +46,11 @@ const routes: Routes = [
 
       {path : 'privacy-policy' , component : PrivacyPolicyComponent , canActivate : [authGuard] },
       {path : 'subscription' , component : SubscriptionComponent , canActivate : [authGuard] },
+
+
+
+      {path : 'paidServices' , component : PaidServicesComponent , canActivate : [authGuard] },
+
 
 
     ],
