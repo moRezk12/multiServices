@@ -1,0 +1,184 @@
+<section class="mt-[40px]">
+  <!-- Add Admin Button -->
+  <div class="mb-6 text-right ">
+    <button (click)="openAddModal()" class="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 transition">
+      + Add Service
+    </button>
+  </div>
+
+  <!-- Modal -->
+  <div *ngIf="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+    <div
+      class="bg-white p-8 rounded-2xl shadow-2xl w-[80%] max-h-[90vh] overflow-y-auto scrrolHide mx-auto relative transition-transform duration-300 scale-100">
+
+      <!-- Header -->
+      <div class="flex items-center mb-6" [ngClass]="{ 'justify-between': !show, 'justify-end': show }">
+        <h2 class="text-2xl font-bold text-gray-800" *ngIf="!show">
+          {{ mode ? 'Edit Service' : 'Add Service' }}
+        </h2>
+        <div
+          class="bg-red-500 hover:bg-red-600 text-white w-8 h-8 flex items-center justify-center rounded-full shadow-md cursor-pointer transition-all duration-300"
+          (click)="closeModal()">
+          ✕
+        </div>
+      </div>
+
+      <!-- Form -->
+      <form [formGroup]="ServiceForm" (ngSubmit)="onSubmit()" class="space-y-6">
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-gray-700 font-medium mb-1">Service Name</label>
+            <input type="text" formControlName="serviceName" placeholder="Service Name"
+              class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+            <div *ngIf="ServiceForm.get('serviceName')?.touched && ServiceForm.get('serviceName')?.invalid"
+              class="text-red-500 text-sm mt-1">
+              Service name is required.
+            </div>
+          </div>
+
+          <!-- subscriptionDuration -->
+          <div>
+            <label class="block text-gray-700 font-medium mb-1">subscriptionDuration</label>
+            <input type="number" formControlName="subscriptionDuration"
+              class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+            <div
+              *ngIf="ServiceForm.get('subscriptionDuration')?.touched && ServiceForm.get('subscriptionDuration')?.invalid"
+              class="text-red-500 text-sm mt-1">
+              Subscription duration is required.
+            </div>
+          </div>
+
+        </div>
+
+
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Phone -->
+          <div>
+            <label class="block text-gray-700 font-medium mb-1">Phone</label>
+            <input type="text" formControlName="phoneNumber" placeholder="+22212345678" maxlength="12"
+              class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+
+            <div *ngIf="
+      ServiceForm.get('phoneNumber')?.invalid &&
+      (ServiceForm.get('phoneNumber')?.dirty || ServiceForm.get('phoneNumber')?.touched)
+    " class="text-red-600 text-sm mt-1">
+              <div *ngIf="ServiceForm.get('phoneNumber')?.errors?.['required']">
+                phoneNumber number is required.
+              </div>
+
+              <div *ngIf="ServiceForm.get('phoneNumber')?.errors?.['pattern']">
+                Phone number must start with <b>+222</b> and contain exactly <b>8 digits</b> after it.
+              </div>
+            </div>
+          </div>
+
+          <!-- Subscription Price -->
+          <div>
+            <label class="block text-gray-700 font-medium mb-1">Subscription Price</label>
+            <input type="number" formControlName="subscriptionPrice"
+              class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+            <div *ngIf="ServiceForm.get('subscriptionPrice')?.touched && ServiceForm.get('subscriptionPrice')?.invalid"
+              class="text-red-500 text-sm mt-1">
+              Subscription price is required.
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Image -->
+        <div class="w-full flex flex-col mb-4">
+          <label class="text-[18px] font-medium text-gray-700 mb-1">Upload Image</label>
+
+          <div class="relative border-2 border-dashed border-blue-500 rounded-lg p-4 flex flex-col items-center justify-center
+     cursor-pointer bg-blue-50 transition h-40">
+
+            <!-- Input -->
+            <input type="file" accept=".jpg,.jpeg,.png,.gif" (change)="onImageSelected($event)"
+              class="absolute inset-0 opacity-0 cursor-pointer" *ngIf="!imagePreview" />
+
+            <!-- No Image -->
+            <ng-container *ngIf="!imagePreview">
+              <svg class="w-12 h-12 text-blue-500 mb-2" fill="none" stroke="currentColor" stroke-width="2"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+              </svg>
+              <p class="text-gray-600">Click to upload Image</p>
+            </ng-container>
+
+            <!-- Image Preview -->
+            <ng-container *ngIf="imagePreview">
+              <div class="relative w-24 h-24">
+                <img [src]="imagePreview" class="w-full h-full object-cover rounded-lg border border-gray-300 shadow">
+                <button type="button" (click)="onRemoveImage()"
+                  class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 transition">✕</button>
+              </div>
+            </ng-container>
+          </div>
+
+          <div *ngIf="ServiceForm.get('invoiceImage')?.touched && ServiceForm.get('invoiceImage')?.invalid"
+            class="text-red-500 text-sm mt-1">
+            Image is required.
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <div class="flex justify-end mt-6">
+          <button type="submit"
+            class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium px-6 py-2 rounded-lg shadow-md transition-all duration-300">
+            {{ mode ? 'Update' : 'Save' }}
+          </button>
+        </div>
+
+      </form>
+
+
+
+    </div>
+  </div>
+
+
+
+  <div class="overflow-x-auto bg-white rounded-xl shadow-lg border border-gray-200">
+    <table class="w-full text-center text-gray-700">
+      <thead>
+        <tr class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm md:text-base">
+          <th class="px-4 py-3">#</th>
+          <th class="px-4 py-3">Service Name</th>
+          <th class="px-4 py-3">Phone</th>
+          <th class="px-4 py-3">subscriptionPrice</th>
+          <th class="px-4 py-3">subscriptionDuration</th>
+          <th class="px-4 py-3">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of Services; let i = index"
+          class="hover:bg-gray-100 transition text-sm md:text-base border-b last:border-none">
+          <td class="px-4 py-3">{{ i + 1 }}</td>
+          <td class="px-4 py-3 font-semibold">{{ user.serviceName }}</td>
+          <td class="px-4 py-3">{{ user.phoneNumber || 'N/A' }}</td>
+          <td class="px-4 py-3">{{ user.subscriptionPrice || 'N/A' }}</td>
+          <td class="px-4 py-3">{{ user.subscriptionDuration  }}</td>
+          <td class="px-4 py-3">
+            <button (click)="openEditModal(user)" class="text-blue-600 hover:text-blue-800 transition">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button (click)="deleteRestaurant(user._id)" class="text-red-600 hover:text-red-800 mx-3 transition">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+            <button (click)="openViewModal(user)" class="text-green-600 hover:text-green-800  transition">
+              <i class="fas fa-eye"></i>
+
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+
+
+
+
+</section>

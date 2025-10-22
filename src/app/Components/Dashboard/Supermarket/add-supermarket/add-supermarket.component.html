@@ -71,11 +71,17 @@
             <label class="block text-gray-700 font-medium mb-1">Phone</label>
             <input type="text" formControlName="phone" placeholder="+22212345678" maxlength="12"
               class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
-            <div *ngIf="supermarketForm.get('phone')?.touched && supermarketForm.get('phone')?.invalid"
-              class="text-red-500 text-sm mt-1">
-              <div *ngIf="supermarketForm.get('phone')?.errors?.['required']">Phone number is required.</div>
+
+            <div *ngIf="
+      supermarketForm.get('phone')?.invalid &&
+      (supermarketForm.get('phone')?.dirty || supermarketForm.get('phone')?.touched)
+    " class="text-red-600 text-sm mt-1">
+              <div *ngIf="supermarketForm.get('phone')?.errors?.['required']">
+                Phone number is required.
+              </div>
+
               <div *ngIf="supermarketForm.get('phone')?.errors?.['pattern']">
-                Must start with <b>+222</b> and have 8 digits after it.
+                Phone number must start with <b>+222</b> and contain exactly <b>8 digits</b> after it.
               </div>
             </div>
           </div>

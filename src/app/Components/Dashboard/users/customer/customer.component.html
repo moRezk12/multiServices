@@ -1,4 +1,11 @@
 <section class="mt-10 px-4">
+
+    <!-- Search -->
+  <div class="mb-6"  >
+    <input type="text" [(ngModel)]="searchTerm" placeholder="Search by email or phone "
+      class="w-full bg-[#f2f2f2] border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+  </div>
+
   <div class="overflow-x-auto bg-white rounded-xl shadow-lg border border-gray-200">
     <table class="w-full text-center text-gray-700">
       <thead>
@@ -13,7 +20,7 @@
       </thead>
       <tbody>
         <tr
-          *ngFor="let user of users; let i = index"
+          *ngFor="let user of filteredProviders(); let i = index"
           class="hover:bg-gray-100 transition text-sm md:text-base border-b last:border-none"
         >
           <td class="px-4 py-3">{{ i + 1 }}</td>

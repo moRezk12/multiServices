@@ -13,6 +13,8 @@ export class CustomerComponent implements OnInit {
 
   users: any[] = []; // Array to hold user data
 
+  searchTerm: string = '';
+
     // Pagination
     currentPage: number = 1;
     totalPages: number = 1;
@@ -29,6 +31,19 @@ export class CustomerComponent implements OnInit {
         // Pagination
     this.updateVisiblePages();
   }
+
+    filteredProviders() {
+  if (!this.searchTerm) {
+    return this.users;
+  }
+
+  const term = this.searchTerm.toLowerCase();
+
+  return this.users.filter((user: any) =>
+    (user.email && user.email.toLowerCase().includes(term)) ||
+    (user.phone && user.phone.toLowerCase().includes(term))
+  );
+}
 
   trackBy(index: number, user: any): number {
     return user.id;
@@ -81,7 +96,7 @@ export class CustomerComponent implements OnInit {
   openViewModal(provider: any) {
     this.showModal = true;
     console.log('Provider details:', provider);
-    this.selectedProvider = provider; 
+    this.selectedProvider = provider;
 
   }
 

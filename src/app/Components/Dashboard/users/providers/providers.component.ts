@@ -10,7 +10,9 @@ import Swal from 'sweetalert2';
 })
 export class ProvidersComponent implements OnInit {
 
-  activeTab: string = 'Doctor'; // الافتراضي
+  searchTerm: string = '';
+
+  activeTab: string = 'Doctor' ; // الافتراضي
   providers: any[] = [];
 
   DoctorForm! : FormGroup;
@@ -44,6 +46,20 @@ export class ProvidersComponent implements OnInit {
 
 
   }
+
+  filteredProviders() {
+  if (!this.searchTerm) {
+    return this.providers;
+  }
+
+  const term = this.searchTerm.toLowerCase();
+
+  return this.providers.filter((driver: any) =>
+    (driver.email && driver.email.toLowerCase().includes(term)) ||
+    (driver.phone && driver.phone.toLowerCase().includes(term))
+  );
+}
+
 
    // Pagination
   goToPage(page: number) {
@@ -79,7 +95,7 @@ export class ProvidersComponent implements OnInit {
       next: (res) => {
         console.log(res);
         this.providers = res.data;
-                this.totalPages = res.pages;
+        this.totalPages = res.pages;
         this.totalUsers = res.total;
         this.currentPage = res.page;
       },

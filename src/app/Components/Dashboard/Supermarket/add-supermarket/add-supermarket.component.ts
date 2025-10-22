@@ -56,11 +56,14 @@ export class AddSupermarketComponent implements OnInit {
       supermarketId: [''],
     });
 
+    this.fixPhonePrefix();
+
+
     // Initialize or fetch data if needed
     this.getAllSupermarket();
   }
 
-  private fixPhonePrefix(): void {
+private fixPhonePrefix(): void {
   const phoneControl = this.supermarketForm.get('phone');
 
   phoneControl?.valueChanges.subscribe(value => {
