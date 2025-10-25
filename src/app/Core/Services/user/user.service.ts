@@ -43,4 +43,15 @@ export class UserService {
     }
 
 
+    // Total Profits
+    getTotalProfits(id : any): Observable<any> {
+      return this.http.get(`${environment.apiUrl}/auth/getDriverStats/${id}`);
+    }
+
+
+    // getDriverOrdersStats
+    getDriverOrdersStats(id : any): Observable<any> {
+      return this.http.get(`${environment.apiUrl}/auth/getDriverOrdersStats/${id}`);
+    }
+
 }

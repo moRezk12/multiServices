@@ -42,6 +42,7 @@ export class ProvidersComponent implements OnInit {
     this.DriverForm = this.fb.group({
       kiloPrice: [null, [Validators.required, Validators.min(0)]],
       isAgree: [false, [Validators.requiredTrue]],
+      totalPoints: [null],
     });
 
 
@@ -140,6 +141,7 @@ openViewModal(provider: any) {
     this.DriverForm.patchValue({
       kiloPrice: driver.kiloPrice,
       isAgree: driver.isAgree,
+      totalPoints: driver.totalPoints
     });
 
 
@@ -219,17 +221,67 @@ openViewModal(provider: any) {
 
 
   showFullImage = false;
-fullImageUrl: string | null = null;
+  fullImageUrl: string | null = null;
 
-openFullImage(url: string) {
-  this.fullImageUrl = url;
-  this.showFullImage = true;
-}
+  openFullImage(url: string) {
+    this.fullImageUrl = url;
+    this.showFullImage = true;
+  }
 
-closeFullImage() {
-  this.showFullImage = false;
-  this.fullImageUrl = null;
-}
+  closeFullImage() {
+    this.showFullImage = false;
+    this.fullImageUrl = null;
+  }
+
+
+
+  showTotalProfits = false;
+
+  totalProficts : any
+  openTotalProfitsModal(driver: any) {
+    console.log(driver);
+    this.userService.getTotalProfits(driver._id).subscribe({
+      next: (res) => {
+        console.log(res);
+        this.showTotalProfits = true;
+        this.totalProficts = res.data
+
+      },
+      error: (err) => {
+        console.error('Error fetching providers:', err);
+      }
+    })
+
+  }
+
+  closeshowTotalProfits() {
+    this.showTotalProfits = false;
+  }
+
+
+    showDlivery = false;
+
+  totalDlivery : any
+  openDliveryModal(driver: any) {
+    console.log(driver);
+    this.userService.getDriverOrdersStats(driver._id).subscribe({
+      next: (res) => {
+        console.log(res);
+        this.showDlivery = true;
+        this.totalDlivery = res.data
+
+      },
+      error: (err) => {
+        console.error('Error fetching providers:', err);
+      }
+    })
+
+  }
+
+  closeshowDlivery() {
+    this.showDlivery = false;
+  }
+
 
 
 }
