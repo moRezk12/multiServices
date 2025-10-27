@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { LoginService } from 'src/app/Core/Services/Auth/login.service';
+import { LocalStorageService } from 'src/app/Core/Services/localStorage/local-storage.service';
 import Swal from 'sweetalert2';
 
 
@@ -18,7 +19,8 @@ export class LoginComponent {
 
   constructor(private fb: FormBuilder ,
     private router : Router,
-    private _loginService : LoginService
+    private _loginService : LoginService,
+    private localStorage : LocalStorageService
   ) {}
 
   ngOnInit(): void {
@@ -54,6 +56,7 @@ export class LoginComponent {
 
       this._loginService.login(data).subscribe({
         next: (res: any) => {
+          console.log(res);
 
           Swal.fire({
             icon: 'success',
@@ -65,7 +68,10 @@ export class LoginComponent {
             timerProgressBar: true,
           }).then(() => {
             if (res.data?.access_Token) {
-              localStorage.setItem('token', res.data.access_Token);
+              this.localStorage.setToken(res.data.access_Token);
+            }
+            if(res.data.checkUser){
+              this.localStorage.setAccountType(res.data.checkUser.accountType);
             }
             this.router.navigate(['/restaurant']);
           });

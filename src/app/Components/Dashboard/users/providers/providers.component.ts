@@ -242,6 +242,8 @@ openViewModal(provider: any) {
     console.log(driver);
     this.userService.getTotalProfits(driver._id).subscribe({
       next: (res) => {
+        console.log("===================");
+
         console.log(res);
         this.showTotalProfits = true;
         this.totalProficts = res.data
@@ -280,6 +282,51 @@ openViewModal(provider: any) {
 
   closeshowDlivery() {
     this.showDlivery = false;
+  }
+
+  onDelete(user: any) {
+    console.log(user._id);
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'This action will permanently delete the restaurant!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.userService.deleteUser(user._id).subscribe({
+          next: (res) => {
+            Swal.fire({
+              icon: 'success',
+              title: res.message || 'Success',
+              text: 'Restaurant deleted successfully!',
+              confirmButtonColor: '#28a745',
+              confirmButtonText: 'OK',
+              timer: 2000,
+              timerProgressBar: true,
+            }).then(() => {
+              this.getAllProviders(this.activeTab);
+            });
+          },
+          error: (err) => {
+            console.error('Error deleting restaurant:', err);
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Failed to delete restaurant. Please try again.',
+              confirmButtonColor: '#d33',
+              confirmButtonText: 'Close',
+              timer: 2000,
+              timerProgressBar: true,
+            });
+          }
+        });
+      }
+    });
+
   }
 
 

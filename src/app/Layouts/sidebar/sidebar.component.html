@@ -2,16 +2,16 @@
   class="bg-gray-900 text-white w-64 h-[calc(100vh-4rem)] fixed top-16 left-0 shadow-lg transition-all duration-300 ease-in-out">
   <div class="mt-4 flex flex-col space-y-2 h-full px-4">
 
-    <ng-container *ngFor="let item of links">
+    <ng-container *ngFor="let item of displayLinks">
 
-      <!-- لو مفيش children -->
+      <!-- بدون children -->
       <a *ngIf="!item.children" routerLinkActive="active" [routerLink]="item.url"
         class="hover:bg-gray-700 px-3 py-2 rounded-lg text-[18px] flex items-center gap-3 transition">
         <i class="fas {{item.icon}}"></i>
         {{item.name}}
       </a>
 
-      <!-- لو فيه children -->
+      <!-- بالـ children -->
       <div *ngIf="item.children" class="flex flex-col">
         <button (click)="toggleDropdown(item.name)"
           class="flex items-center justify-between hover:bg-gray-700 px-3 py-2 rounded-lg text-[18px] w-full transition">

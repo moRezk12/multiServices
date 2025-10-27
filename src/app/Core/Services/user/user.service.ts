@@ -54,4 +54,9 @@ export class UserService {
       return this.http.get(`${environment.apiUrl}/auth/getDriverOrdersStats/${id}`);
     }
 
+    // Delete User
+    deleteUser(id: any): Observable<any> {
+      return this.http.delete(`${environment.apiUrl}/auth/deleteUserByOwner/${id}`);
+    }
+
 }

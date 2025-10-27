@@ -1,5 +1,6 @@
 import { UserService } from 'src/app/Core/Services/user/user.service';
 import { Component, OnInit } from '@angular/core';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-customer',
@@ -99,5 +100,52 @@ export class CustomerComponent implements OnInit {
     this.selectedProvider = provider;
 
   }
+
+
+  onDelete(user: any) {
+    console.log(user._id);
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'This action will permanently delete the restaurant!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.UserService.deleteUser(user._id).subscribe({
+          next: (res) => {
+            Swal.fire({
+              icon: 'success',
+              title: res.message || 'Success',
+              text: 'Restaurant deleted successfully!',
+              confirmButtonColor: '#28a745',
+              confirmButtonText: 'OK',
+              timer: 2000,
+              timerProgressBar: true,
+            }).then(() => {
+              this.getAllUsers(this.currentPage);
+            });
+          },
+          error: (err) => {
+            console.error('Error deleting restaurant:', err);
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Failed to delete restaurant. Please try again.',
+              confirmButtonColor: '#d33',
+              confirmButtonText: 'Close',
+              timer: 2000,
+              timerProgressBar: true,
+            });
+          }
+        });
+      }
+    });
+
+  }
+
 
 }

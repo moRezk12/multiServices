@@ -1,7 +1,8 @@
 <section class="mt-10 px-4">
 
   <!-- Search -->
-  <div class="mb-6" *ngIf="activeTab === 'driver' || activeTab === 'Driver' || activeTab === 'delivery' || activeTab === 'Delivery' " >
+  <div class="mb-6"
+    >
     <input type="text" [(ngModel)]="searchTerm" placeholder="Search by email or phone "
       class="w-full bg-[#f2f2f2] border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
   </div>
@@ -52,7 +53,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let doctor of providers; let i = index" class="border-b hover:bg-gray-50 text-center transition">
+        <tr *ngFor="let doctor of filteredProviders(); let i = index" class="border-b hover:bg-gray-50 text-center transition">
           <td class="px-4 py-3">{{ i + 1 }}</td>
           <td class="px-4 py-3 font-semibold">{{ doctor.fullName || 'N/A' }}</td>
           <td class="px-4 py-3">{{ doctor.email || 'N/A' }}</td>
@@ -75,8 +76,12 @@
               View
             </button>
             <button (click)="openEditModalDoctor(doctor)"
-              class="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+              class="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700 mx-[10px]">
               Edit
+            </button>
+            <button (click)="onDelete(doctor)"
+              class="px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
+              Delete
             </button>
           </td>
         </tr>
@@ -100,7 +105,8 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let driver of filteredProviders(); let i = index" class="border-b hover:bg-gray-50 text-center transition">
+        <tr *ngFor="let driver of filteredProviders(); let i = index"
+          class="border-b hover:bg-gray-50 text-center transition">
           <td class="px-4 py-3">{{ i + 1 }}</td>
           <td class="px-4 py-3 font-semibold">{{ driver.fullName || 'N/A' }}</td>
           <td class="px-4 py-3">{{ driver.email || driver.phone || 'N/A' }}</td>
@@ -118,10 +124,18 @@
               class="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700 mx-[10px] ">
               Edit
             </button>
-            <button *ngIf="driver.serviceType === 'Driver' || driver.serviceType === 'driver' " (click)="openTotalProfitsModal(driver)" class="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700" >
+            <button (click)="onDelete(driver)"
+              class="px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
+              Delete
+            </button>
+            <button *ngIf="driver.serviceType === 'Driver' || driver.serviceType === 'driver' "
+              (click)="openTotalProfitsModal(driver)"
+              class="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700 mx-[10px] ">
               Total Profits
             </button>
-            <button *ngIf="driver.serviceType === 'Delivery' || driver.serviceType === 'delivery' " (click)="openDliveryModal(driver)" class="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700" >
+            <button *ngIf="driver.serviceType === 'Delivery' || driver.serviceType === 'delivery' "
+              (click)="openDliveryModal(driver)"
+              class="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
               Total Profits
             </button>
         </tr>
@@ -434,7 +448,7 @@
 
 <div *ngIf="showTotalProfits" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
   <div
-    class="bg-white p-8 rounded-2xl shadow-2xl w-[80%] max-h-[90vh] overflow-y-auto scrollbar-hide mx-auto relative transition-transform duration-300 scale-100">
+    class="bg-white p-8 rounded-2xl shadow-2xl w-[90%] max-h-[90vh] overflow-y-auto scrollbar-hide mx-auto relative transition-transform duration-300 scale-100">
 
     <!-- Header -->
     <div class="flex items-center justify-between mb-6">
@@ -448,8 +462,8 @@
       </div>
     </div>
 
-
-     <div *ngIf="totalProficts" class="space-y-4 text-gray-700">
+    <!-- إجمالي الإحصائيات -->
+    <div *ngIf="totalProficts" class="space-y-6 text-gray-700">
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
 
         <!-- Today -->
@@ -476,9 +490,44 @@
         <!-- Total -->
         <div class="p-4 bg-gray-100 rounded-xl shadow-sm">
           <h3 class="font-semibold text-lg mb-2 text-red-600">Total</h3>
-          <p>Total Earnings: {{ totalProficts.totalEarnings }} EGP</p>
-          <p>Cancelled Orders: {{ totalProficts.cancelledCount }}</p>
-          <p>Finished Orders: {{ totalProficts.finishedCount }}</p>
+          <p><strong>Total Earnings:</strong> {{ totalProficts.totalEarnings }} EGP</p>
+          <p><strong>Cancelled Orders:</strong> {{ totalProficts.cancelledCount }}</p>
+          <p><strong>Finished Orders:</strong> {{ totalProficts.finishedCount }}</p>
+        </div>
+      </div>
+
+      <!-- 🧾 عرض كل الطلبات -->
+      <div *ngIf="totalProficts.rideHistory?.length" class="mt-8">
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Ride History</h3>
+
+        <div class="overflow-x-auto">
+          <table class="min-w-full bg-white border border-gray-200 rounded-xl shadow-sm">
+            <thead class="bg-gray-100 text-gray-700 text-left">
+              <tr class="text-center" >
+                <th class="px-4 py-2 border-b">#</th>
+                <th class="px-4 py-2 border-b">Date</th>
+                <th class="px-4 py-2 border-b">Status</th>
+                <th class="px-4 py-2 border-b">Price </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let ride of totalProficts.rideHistory; let i = index" class="hover:bg-gray-50 text-center ">
+                <td class="px-4 py-2 border-b text-gray-600">{{ i + 1 }}</td>
+                <td class="px-4 py-2 border-b text-gray-600">{{ ride.createdAt | date:'medium' }}</td>
+                <td class="px-4 py-2 border-b">
+                  <span class="px-2 py-1 rounded-full text-sm"
+                        [ngClass]="{
+                          'bg-green-100 text-green-700': ride.status.includes('finished'),
+                          'bg-yellow-100 text-yellow-700': ride.status.includes('ongoing'),
+                          'bg-red-100 text-red-700': ride.status.includes('cancelled')
+                        }">
+                    {{ ride.status }}
+                  </span>
+                </td>
+                <td class="px-4 py-2 border-b text-gray-800 font-medium">{{ ride.price }}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -488,10 +537,8 @@
       No data available.
     </div>
 
-
   </div>
 </div>
-
 
 
 
@@ -515,7 +562,7 @@
     </div>
 
 
-<div *ngIf="totalDlivery" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-gray-700">
+    <div *ngIf="totalDlivery" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-gray-700">
 
       <!-- Accepted Orders -->
       <div class="p-4 bg-gray-100 rounded-xl shadow-sm">
